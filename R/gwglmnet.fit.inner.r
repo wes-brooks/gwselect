@@ -74,7 +74,13 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         if (i==N) {            
             permutation = 1:n.weighted
         } else {
-            permutation = sample(1:n.weighted, replace=TRUE)
+            tot.w = sum(w)
+            permutation = vector()
+            while (sum(w[permutation]) < tot.w) {
+                permutation = c(permutation, sample(1:n.weighted, size=1))
+            }
+
+            permutation = permutation[1:which.min(tot.w - cumsum(w[permutation]))]
         }
 
         colocated = which(gwr.weights[weighted][permutation]==1)
