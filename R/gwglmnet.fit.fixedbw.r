@@ -29,6 +29,8 @@ gwglmnet.fit.fixedbw = function(x, y, family, coords, fit.loc=NULL, oracle, bw, 
             models[[i]] = gwselect.fit.oracle(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, gwr.weights=gw, prior.weights=prior.weights, gweight=gweight, AICc=AICc)
         }
         
+print(models[[i]])
+
         if (verbose) {
 	        cat(paste("For i=", i, "; location=(", paste(round(loc,3), collapse=","), "); bw=", round(bw, 3), "; loss=", round(tail(models[[i]][['loss.local']],1),3), "; s=", models[[i]][['s']], "; sigma2=", round(tail(models[[i]][['sigma2']],1),3), "; nonzero=", paste(models[[i]][['nonzero']], collapse=","), "; weightsum=", round(models[[i]][['weightsum']],3), ".\n", sep=''))
 		}
