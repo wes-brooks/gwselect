@@ -32,9 +32,10 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         maximum=FALSE, formula=formula, indx=indx, coords=coords, env=oo, oracle=oracle, s=s, family=family, mode.select=mode.select,
         gweight=gweight, verbose=verbose, longlat=longlat, data=data, method=method, alpha=alpha, shrunk.fit=shrunk.fit,
         weights=weights, tol=tol, adapt=adapt, parallel=parallel, precondition=precondition, N=1, interact=interact, AICc=AICc)
-    assign('gwglmnet.sel.trace', oo$trace, env=.GlobalEnv)
+    trace = oo$trace
+    rm(oo)
 
     bdwt <- opt$minimum
     res <- bdwt
-    res
+    return(list(res=res, trace=trace))
 }
