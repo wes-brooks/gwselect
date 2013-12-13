@@ -24,9 +24,9 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
     }
     else { loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['loss.local']])})) }
 
-    trace = mget('trace', env=env, ifnotfound=list(matrix(NA, nrow=0, ncol=2)))
-    trace = rbind(trace, c(bw, loss))
-    assign('trace', trace, env=env)
+    res = mget('trace', env=env, ifnotfound=list(matrix(NA, nrow=0, ncol=2)))
+    res$trace = rbind(res$trace, c(bw, loss))
+    assign('trace', res$trace, env=env)
 
     cat(paste('Bandwidth: ', round(bw, 3), '. Loss: ', signif(loss, 5), '\n', sep=''))
     return(loss)
