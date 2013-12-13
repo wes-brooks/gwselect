@@ -27,11 +27,12 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         }
     }
 
-    oo = new.env(parent=baseenv())
+    oo = new.env()
     opt <- optimize(gwglmnet.cv.f, lower=beta1, upper=beta2, 
-        maximum=FALSE, formula=formula, indx=indx, coords=coords, oracle=oracle, s=s, family=family, mode.select=mode.select,
+        maximum=FALSE, formula=formula, indx=indx, coords=coords, env=oo, oracle=oracle, s=s, family=family, mode.select=mode.select,
         gweight=gweight, verbose=verbose, longlat=longlat, data=data, method=method, alpha=alpha, shrunk.fit=shrunk.fit,
         weights=weights, tol=tol, adapt=adapt, parallel=parallel, precondition=precondition, N=1, interact=interact, AICc=AICc)
+    assign('gwglmnet.sel.trace', oo$trace, env=.GlobalEnv)
 
     bdwt <- opt$minimum
     res <- bdwt

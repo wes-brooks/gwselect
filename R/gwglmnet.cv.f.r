@@ -1,4 +1,4 @@
-gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweight, oracle, mode.select, verbose, adapt, longlat, s, tol, method, N, parallel, precondition, interact, alpha, shrunk.fit, AICc) {    
+gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweight, env, oracle, mode.select, verbose, adapt, longlat, s, tol, method, N, parallel, precondition, interact, alpha, shrunk.fit, AICc) {    
     #Generate the model with the given bandwidth:
     cat(paste("starting bw:", round(bw, 3), '\n', sep=''))
     gwglmnet.model = gwglmnet(formula=formula, data=data, family=family, weights=weights, tuning=TRUE, indx=indx, coords=coords, gweight=gweight, oracle=oracle, bw=bw, N=N, mode.select=mode.select, verbose=verbose, longlat=longlat, adapt=adapt, s=s, method=method, parallel=parallel, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, AICc=AICc)
@@ -24,9 +24,9 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
     }
     else { loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['loss.local']])})) }
 
-    trace = mget('trace', env=oo, ifnotfound=list(matrix(NA, nrow=0, ncol=2)))
+    trace = mget('trace', env=env, ifnotfound=list(matrix(NA, nrow=0, ncol=2)))
     trace = rbind(trace, c(bw, loss))
-    assign('trace', trace, env=oo)
+    assign('trace', trace, env=env)
 
     cat(paste('Bandwidth: ', round(bw, 3), '. Loss: ', signif(loss, 5), '\n', sep=''))
     return(loss)
