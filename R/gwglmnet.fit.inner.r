@@ -1,4 +1,4 @@
-gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, s=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, adapt, interact, precondition, N=1, alpha, tau=3, shrunk.fit, AICc) {
+gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, s=NULL, event=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, adapt, interact, precondition, N=1, alpha, tau=3, shrunk.fit, AICc) {
     if (!is.null(indx)) {
         colocated = which(round(coords[indx,1],5)==round(as.numeric(loc[1]),5) & round(coords[indx,2],5) == round(as.numeric(loc[2]),5))
     }
@@ -136,6 +136,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         if (interact) {xxx = xx.interacted[permutation,]}
 
 		if (family == 'binomial') { model = glmnet(x=fitx, y=cbind(1-fity, fity), standardize=FALSE, intercept=TRUE, family=family, weights=w[permutation], alpha=alpha) }
+        else if (family=='cox') { model = glmnet(x=fitx, y=as.matrix(cbind(fity, event)), standardize=FALSE, intercept=TRUE, family=family, weights=w[permutation], alpha=alpha) }
         else { model = glmnet(x=fitx, y=fity, standardize=FALSE, intercept=TRUE, family=family, weights=w[permutation], alpha=alpha) }
         nsteps = length(model$lambda) + 1   
     
