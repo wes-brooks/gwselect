@@ -68,7 +68,7 @@ gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, 
 
         if (method=='nen') {
             if (parallel) {
-                res[['model']] = gwglmnet.fit.nenparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, indx=indx, N=N, coords=coords, oracle=oracle, fit.loc=fit.loc, D=D, longlat=longlat, mode.select=mode.select, s=s, verbose=verbose, adapt=adapt, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol=tol, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, AICc=AICc)
+                res[['model']] = gwglmnet.fit.nenparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, indx=indx, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, mode.select=mode.select, s=s, verbose=verbose, adapt=adapt, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol=tol, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, AICc=AICc)
             } else {
                 res[['model']] = gwglmnet.fit.nen(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, indx=indx, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, mode.select=mode.select, s=s, verbose=verbose, adapt=adapt, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol=tol, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, AICc=AICc)
             }
