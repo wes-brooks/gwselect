@@ -27,9 +27,6 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         }
     }
 
-print(beta1)
-print(beta2)
-
     oo = new.env()
     opt <- optimize(gwglmnet.cv.f, interval=c(beta1, beta2), 
         maximum=FALSE, formula=formula, indx=indx, coords=coords, env=oo, oracle=oracle, s=s, family=family, mode.select=mode.select,
