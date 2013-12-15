@@ -44,7 +44,8 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
             beta2 <- 1
         } else if (method == 'nen') {
             if (family=='binomial') {beta2 = sum(weights/(mean(y)*(1-mean(y))) * (y-mean(y))**2)}
-            if (family=='poisson') {beta2 = sum(weights/(mean(y)) * (y-mean(y))**2)}
+            else if (family=='poisson') {beta2 = sum(weights/(mean(y)) * (y-mean(y))**2)}
+            else if (family=='gaussian') {beta2 = sum(weights * (y-mean(y))**2)}
             beta1 = beta2/1000
         }
     }
