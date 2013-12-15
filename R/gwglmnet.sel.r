@@ -37,5 +37,5 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
 
     bdwt <- opt$minimum
     res <- bdwt
-    return(list(res=res, trace=trace))
+    return(list(bw=res, trace=trace))
 }
