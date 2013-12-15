@@ -6,6 +6,28 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
     if (missing(coords)) 
         stop("Observation coordinates have to be given")
         
+    mf <- match.call(expand.dots = FALSE)
+    #m <- match(c("formula", "data", "weights"), names(mf), 0)
+    m <- match(c("formula", "data"), names(mf), 0)
+    mf <- mf[c(1, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1]] <- as.name("model.frame")
+    mf <- eval(mf, parent.frame())
+    mt <- attr(mf, "terms")
+    dp.n <- length(model.extract(mf, "response"))
+    #weights <- as.vector(model.extract(mf, "weights"))
+    if (!is.null(weights) && !is.numeric(weights)) 
+        stop("'weights' must be a numeric vector")
+    if (is.null(weights)) 
+        weights <- rep(as.numeric(1), dp.n)
+    if (any(is.na(weights))) 
+        stop("NAs in weights")
+    if (any(weights < 0)) 
+        stop("negative weights")
+    y <- model.extract(mf, "response")
+
+        
+        
     if (!is.null(range)) {
         beta1 = min(range)
         beta2 = max(range)
