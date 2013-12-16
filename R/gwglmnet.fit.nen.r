@@ -12,7 +12,7 @@ gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, s, mode.sele
 
         opt = optimize(gwglmnet.ssr, lower=beta1, upper=beta2, 
             maximum=FALSE, tol=target/1000, x=x, y=y, coords=coords, loc=loc, s=s, alpha=alpha,
-            gweight=gweight, verbose=verbose, dist=dist, adapt=adapt, family=family, oracle=oracle,
+            gweight=gweight, verbose=verbose, dist=dist, mode.select=mode.select, adapt=adapt, family=family, oracle=oracle,
             prior.weights=prior.weights, target=target, precondition=precondition, interact=interact, shrunk.fit=shrunk.fit, AICc=AICc)
         bandwidth = opt$minimum
 
