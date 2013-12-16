@@ -11,7 +11,7 @@ gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, s, mode.sele
         dist = D[i,]
 
         opt = optimize(gwglmnet.ssr, lower=beta1, upper=beta2, 
-            maximum=FALSE, tol=target/1000, x=x, y=y, coords=coords, loc=loc, s=s,
+            maximum=FALSE, tol=target/1000, x=x, y=y, coords=coords, loc=loc, s=s, alpha=alpha,
             gweight=gweight, verbose=verbose, dist=dist, adapt=adapt, family=family, oracle=oracle,
             prior.weights=prior.weights, target=target, precondition=precondition, shrunk.fit=shrunk.fit, AICc=AICc)
         bandwidth = opt$minimum
