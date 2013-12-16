@@ -218,7 +218,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                         
                         #These are for deviance residuals:
                         if (family=='gaussian') {
-                            print('here'!)
+                            print('here!')
                             ssr.local = sum((w[permutation]*(fitted - yyy)**2)[colocated])
                             ssr = sum((w[permutation]*(fitted - yyy)**2))
                             print(ssr)
