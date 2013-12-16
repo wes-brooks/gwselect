@@ -4,7 +4,7 @@ gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, s, mode.sele
     gwglmnet.object = list()
     models = list()
 
-    if (verbose) {cat(paste('beta1:', beta1, ', beta2:', beta2, '\n', sep=''))}
+    if (verbose) {cat(paste('beta1:', round(beta1,3), ', beta2:', round(beta2,3), '\n', sep=''))}
 
     for (i in 1:n) {
         loc = coords.unique[i,]

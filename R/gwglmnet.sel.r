@@ -38,7 +38,7 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
             if (any(!is.finite(difmin))) 
                 difmin[which(!is.finite(difmin))] <- 0
             beta1 <- difmin/1000
-            beta2 <- difmin
+            beta2 <- 2*difmin
         } else if (method == 'knn') {
             beta1 <- 0
             beta2 <- 1
