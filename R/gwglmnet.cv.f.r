@@ -4,7 +4,7 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
     gwglmnet.model = gwglmnet(formula=formula, data=data, family=family, weights=weights, tuning=TRUE, indx=indx, coords=coords, gweight=gweight, oracle=oracle, bw=bw, N=N, mode.select=mode.select, verbose=verbose, longlat=longlat, adapt=adapt, s=s, method=method, parallel=parallel, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, AICc=AICc)
 
     if (AICc) {
-        trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['loss.local']]})) 
+        trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['loss.local']],1)})) 
 
         #Local sigma^2:
         #loss = nrow(data) * (mean(sapply(gwglmnet.model[['model']][['models']], function(x) {log(x[['sigma2']])})) + 1 + (2*(trH+1))/(nrow(data)-trH-2) + log(2*pi))
