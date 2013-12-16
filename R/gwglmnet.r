@@ -64,7 +64,7 @@ gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, 
         if (any(!is.finite(difmin))) 
             difmin[which(!is.finite(difmin))] <- 0
         beta1 = difmin/300
-        beta2 = 2*difmin
+        beta2 = 10*difmin
 
         if (method=='nen') {
             if (parallel) {
