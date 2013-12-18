@@ -16,7 +16,7 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
         #}
         #else if (family %in% c('binomial', 'poisson')) {
         #	#Use GCV (OSullivan et al. 1986)
-        #	loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['ssr.local']]})) / (nrow(data)-trH)**2
+        	loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['ssr.local']]})) / (nrow(data)-trH)**2
         #}
         
         #"Simplistic" BIC - based on eq4.22 from the Fotheringham et al. book:
