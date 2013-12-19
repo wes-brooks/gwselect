@@ -219,10 +219,14 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                         #These are for deviance residuals:
                         if (family=='gaussian') {
                             ssr.local = sum((w[permutation]*(fitted - yyy)**2)[colocated])
-                            ssr = sum((w[permutation]*(fitted - yyy)**2))
+                            ssr = sum(w[permutation]*(fitted - yyy)**2)
+                        } else if (family=='poisson') {
+                            ssr.local = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])
+                            ssr = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))
+                        } else if (family=='binomial') {
+                            ssr.local = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])
+                            ssr = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))
                         }
-                        else if (family=='poisson') {ssr.local = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])}
-                        else if (family=='binomial') {ssr.local = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])}
 
                         #These are for Pearson residuals:
                         #if (family=='gaussian') {ssr.local = sum((w[permutation]*(fitted - yyy)**2)[colocated])}

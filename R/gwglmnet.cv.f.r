@@ -21,8 +21,9 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
         
         #"Simplistic" BIC - based on eq4.22 from the Fotheringham et al. book:
         #loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['ssr.local']]}))) + 1 + log(2*pi)) + trH * log(nrow(data))/2
+    } else {
+        loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['loss.local']])}))
     }
-    else { loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['loss.local']])})) }
 
     res = mget('trace', env=env, ifnotfound=list(matrix(NA, nrow=0, ncol=2)))
     res$trace = rbind(res$trace, c(bw, loss))
