@@ -6,7 +6,7 @@ gwglmnet.ssr = function(bw, x, y, family, coords, loc, dist, s, verbose, prior.w
         gwglmnet.object = gwselect.fit.oracle(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, gwr.weights=NULL, interact=interact, prior.weights=prior.weights, gweight=gweight, bw.select=bw.select, resid.type=resid.type)
     }
     
-    loss = gwglmnet.object[['ssr']]
+    loss = gwglmnet.object[['ssr']][[resid.type]]
     if (verbose) {cat(paste('loc:(', paste(round(loc,3), collapse=","), '), target: ', round(target,3), ', bw:', round(bw,3), ', ssr:', round(loss,3), ', miss:', round(abs(loss-target),3), '\n', sep=""))}
     return(abs(loss-target))
 }

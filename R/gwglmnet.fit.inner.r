@@ -213,28 +213,31 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                 }
                 
                 if (length(colocated)>0) {
+                    tunelist[['ssr-loc']] = list()
+                    tunelist[['ssr']] = list()
+                    
                     #Pearson residuals:
                     if (family=='gaussian') {
-                        tunelist[['ssr-loc-pearson']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
-                        tunelist[['ssr-pearson']] = sum(w[permutation]*(fitted - yyy)**2)
+                        tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
+                        tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2)
                     } else if (family=='poisson') {
-                        tunelist[['ssr-loc-pearson']] = sum((w[permutation]*(yyy - fitted)**2/fitted)[colocated])
-                        tunelist[['ssr-pearson']] = sum(w[permutation]*(fitted - yyy)**2/fitted)
+                        tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/fitted)[colocated])
+                        tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/fitted)
                     } else if (family=='binomial') {
-                        tunelist[['ssr-loc-pearson']] = sum((w[permutation]*(yyy - fitted)**2/(fitted*(1-fitted)))[colocated])
-                        tunelist[['ssr-pearson']] = sum(w[permutation]*(fitted - yyy)**2/(fitted*(1-fitted)))
+                        tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/(fitted*(1-fitted)))[colocated])
+                        tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/(fitted*(1-fitted)))
                     }
 
                     #Deviance residuals:
                     if (family=='gaussian') {
-                        tunelist[['ssr-loc-dev']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
-                        tunelist[['ssr-dev']] = sum(w[permutation]*(fitted - yyy)**2)
+                        tunelist[['ssr-loc']][['deviance']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
+                        tunelist[['ssr']][['deviance']] = sum(w[permutation]*(fitted - yyy)**2)
                     } else if (family=='poisson') {
-                        tunelist[['ssr-loc-dev']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])
-                        tunelist[['ssr-dev']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))
+                        tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])
+                        tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))
                     } else if (family=='binomial') {
-                        tunelist[['ssr-loc-dev']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])
-                        tunelist[['ssr-dev']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))
+                        tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])
+                        tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))
                     }
 
                     if (family=='gaussian') {
