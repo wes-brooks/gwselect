@@ -1,4 +1,4 @@
-gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweight, env, oracle, mode.select, verbose, adapt, longlat, s, tol, method, N, parallel, precondition, interact, alpha, shrunk.fit, bw.select resid.type) {    
+gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweight, env, oracle, mode.select, verbose, adapt, longlat, s, tol, method, N, parallel, precondition, interact, alpha, shrunk.fit, bw.select, resid.type) {    
     #Generate the model with the given bandwidth:
     cat(paste("starting bw:", round(bw, 3), '\n', sep=''))
     gwglmnet.model = gwglmnet(formula=formula, data=data, family=family,
