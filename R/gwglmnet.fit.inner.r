@@ -202,6 +202,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                     se.unshrunk = rep(0, ncol(x) + 1)
                     se.unshrunk[c(1, varset + 1)] = summary(m)$coefficients[,'Std. Error']
                 } else {
+                    modeldata = data.frame(y=yy[permutation], xxx)
+                    m = glm(y~1, data=modeldata, weights=w[permutation], family=family)
                     coefs.unshrunk = rep(0, ncol(xx) + 1)
                     coefs.unshrunk[1] = sum(fity * w[permutation]) / sum(w[permutation])
                     
