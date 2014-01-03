@@ -8,18 +8,21 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
         precondition=precondition, interact=interact, alpha=alpha,
         shrunk.fit=shrunk.fit, bw.select=bw.select, resid.type=resid.type)
 
+    if (resid.type=='pearson') { reskey = 'ssr-loc-pearson' }
+    else if (resid.type=='deviance') { reskey = 'ssr-loc-dev' }
+    
     if (bw.select=='AICc') {
         trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)})) 
-       	loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['ssr.local']]}))) + 1 + (2*(trH+1))/(nrow(data)-trH-2) + log(2*pi))
+       	loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']][[reskey]]}))) + 1 + (2*(trH+1))/(nrow(data)-trH-2) + log(2*pi))
     } else if (bw.select=='GCV') {
         trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)})) 
         if (resid.type=='deviance') {
-            loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']]})) / (nrow(data)-trH)**2
+            loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']][[reskey]]})) / (nrow(data)-trH)**2
         } else if (resid.type=='pearson') {
-            loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']]})) / (nrow(data)-trH)**2
+            loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']][[reskey]]})) / (nrow(data)-trH)**2
         }
     } else if (bw.select=='BICg') {
-        loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['loss.local']])}))
+        loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['tunelist']][[reskey]])}))
         #"Simplistic" BIC - based on eq4.22 from the Fotheringham et al. book:
         #loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['ssr.local']]}))) + 1 + log(2*pi)) + trH * log(nrow(data))/2
     }
