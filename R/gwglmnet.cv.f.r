@@ -17,7 +17,7 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
     } else if (bw.select=='BICg') {
         loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {
             s2 = x[['tunelist']][['s2']]
-            if (family='gaussian') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]])/s2 + log(s2) }
+            if (family=='gaussian') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]])/s2 + log(s2) }
             else if (family=='binomial') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]]) }
             else if (family=='poisson') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]])/s2 }
             df = v[['tunelist']][['df']]
