@@ -15,7 +15,15 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
         trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)})) 
         loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']][['ssr-loc']][[resid.type]]})) / (nrow(data)-trH)**2
     } else if (bw.select=='BICg') {
-        loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['tunelist']][[reskey]])}))
+        loss = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {
+            s2 = x[['tunelist']][['s2']]
+            if (family='gaussian') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]])/s2 + log(s2) }
+            else if (family=='binomial') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]]) }
+            else if (family=='poisson') { ll = min(x[['tunelist']][['ssr-loc']][[resid.type]])/s2 }
+            df = v[['tunelist']][['df']]
+            return(ll + log(x[['tunelist']][['n']]) * df / x[['tunelist']][['n']])
+            }))
+        loss = loss + sum(sapply(gwglmnet.model[['model']][['models']], function(x) {min(x[['tunelist']][['ssr-loc']][[resid.type]])}))
         #"Simplistic" BIC - based on eq4.22 from the Fotheringham et al. book:
         #loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['ssr.local']]}))) + 1 + log(2*pi)) + trH * log(nrow(data))/2
     }

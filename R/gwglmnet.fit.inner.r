@@ -249,7 +249,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                     }
                     tunelist[['n']] = sum(w[permutation])
                     tunelist[['trace.local']] = Hii
-                    
+                    tunelist[['df']] = df                    
                 } else {
                     loss.local = NA
                 }                   
