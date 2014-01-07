@@ -26,7 +26,7 @@ gwglmnet.fit.knnparallel = function(x, y, family, coords, fit.loc, oracle, D, ve
         if (is.null(oracle)) {
 	        m = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, indx=indx, loc=loc, bw=bandwidth, dist=dist, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, precondition=precondition, N=N, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit)
         } else {
-            m = gwselect.fit.oracle(x=x, y=y, bw=bandwidth, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, dist=dist, prior.weights=prior.weights, gweight=gweight, interact=interact)
+            m = gwselect.fit.oracle(x=x, y=y, family=family, bw=bandwidth, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, dist=dist, prior.weights=prior.weights, gweight=gweight, interact=interact)
         }
         
         if (verbose) {

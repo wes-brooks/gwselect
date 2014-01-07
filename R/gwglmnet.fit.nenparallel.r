@@ -21,7 +21,13 @@ gwglmnet.fit.nenparallel = function(x, y, family, coords, indx, fit.loc, D, mode
         	cat(paste("For i=", i, ", target:", round(target,3), ", bw=", round(bandwidth,3), ", tolerance=", round(target/1000,3), ", miss=", round(opt$objective,3), ".\n", sep=''))
         }
 
-        return(gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bandwidth, dist=dist, mode.select=mode.select, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, tuning=tuning, simulation=simulation, predict=predict, precondition=precondition, N=N, interact=interact, shrunk.fit=shrunk.fit, alpha=alpha))
+        if (is.null(oracle)) {
+            m = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bandwidth, dist=dist, mode.select=mode.select, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, tuning=tuning, simulation=simulation, predict=predict, precondition=precondition, N=N, interact=interact, shrunk.fit=shrunk.fit, alpha=alpha)
+        } else {
+            m = gwselect.fit.oracle(x=x, y=y, family=family, bw=bandwidth, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, dist=dist, prior.weights=prior.weights, gweight=gweight, interact=interact)
+        }
+
+        return(m)
     }
 
     gwglmnet.object[['models']] = models

@@ -17,7 +17,11 @@ gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, mode.select,
             prior.weights=prior.weights, target=target, precondition=precondition, interact=interact, shrunk.fit=shrunk.fit)
         bandwidth = opt$minimum
 
-        models[[i]] = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bandwidth, dist=dist, mode.select=mode.select, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, tuning=tuning, simulation=simulation, predict=predict, precondition=precondition, N=N, interact=interact, shrunk.fit=shrunk.fit, alpha=alpha)
+        if (is.null(oracle)) {
+            models[[i]] = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bandwidth, dist=dist, mode.select=mode.select, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, tuning=tuning, simulation=simulation, predict=predict, precondition=precondition, N=N, interact=interact, shrunk.fit=shrunk.fit, alpha=alpha)
+        } else {
+            models[[i]] = gwselect.fit.oracle(x=x, y=y, family=family, bw=bandwidth, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, dist=dist, prior.weights=prior.weights, gweight=gweight, interact=interact)
+        }
 
 		if (verbose) {
         	cat(paste("For i=", i, ", target:", round(target,3), ", bw=", round(bandwidth,3), ", tolerance=", round(target/1000,3), ", miss=", round(opt$objective,3), ".\n", sep=''))
