@@ -1,4 +1,4 @@
-gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, s=NULL, event=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, adapt, interact, precondition, N=1, alpha, tau=3, shrunk.fit, bw.select=c('AICc', 'GCV', 'BICg'), resid.type=c('deviance', 'pearson')) {
+gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, event=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, interact, precondition, N=1, alpha, tau=3, shrunk.fit) {
     if (!is.null(indx)) {
         colocated = which(round(coords[indx,1],5)==round(as.numeric(loc[1]),5) & round(coords[indx,2],5) == round(as.numeric(loc[2]),5))
     }

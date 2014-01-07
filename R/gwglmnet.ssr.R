@@ -1,9 +1,9 @@
-gwglmnet.ssr = function(bw, x, y, family, coords, loc, dist, s, verbose, prior.weights, gweight, target, adapt, mode.select, precondition, interact, alpha, oracle, shrunk.fit, bw.select, resid.type) {
+gwglmnet.ssr = function(bw, x, y, family, coords, loc, dist, verbose, prior.weights, gweight, target, mode.select, precondition, interact, alpha, oracle, shrunk.fit, resid.type) {
     if (is.null(oracle)) {
-        gwglmnet.object = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bw, dist=dist, s=s, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, adapt=adapt, mode.select=mode.select, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, predict=TRUE, tuning=FALSE, simulation=FALSE, bw.select=bw.select, resid.type=resid.type)
+        gwglmnet.object = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bw, dist=dist, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, mode.select=mode.select, precondition=precondition, interact=interact, alpha=alpha, shrunk.fit=shrunk.fit, predict=TRUE, tuning=FALSE, simulation=FALSE)
     }
     else {
-        gwglmnet.object = gwselect.fit.oracle(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, gwr.weights=NULL, interact=interact, prior.weights=prior.weights, gweight=gweight, bw.select=bw.select, resid.type=resid.type)
+        gwglmnet.object = gwselect.fit.oracle(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, gwr.weights=NULL, interact=interact, prior.weights=prior.weights, gweight=gweight)
     }
     
     loss = gwglmnet.object[['ssr']][[resid.type]]
