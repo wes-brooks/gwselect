@@ -1,5 +1,4 @@
-gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, coords, oracle=NULL, indx=NULL, gweight=gwr.Gauss, bw.method="dist", mode.select='AIC', verbose=FALSE, longlat=FALSE, tol.loc=.Machine$double.eps^0.25, tol.bw=.Machine$double.eps^0.25, parallel=FALSE, alpha=1, precondition=FALSE, interact=FALSE, shrunk.fit=TRUE, bw.select=c('AICc', 'GCV', 'BICg'), resid.type=c('deviance', 'pearson')) {
-
+gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, coords, oracle=NULL, indx=NULL, gweight=gwr.Gauss, bw.method=c('dist','knn','nen'), mode.select=c('AIC','BIC','CV'), verbose=FALSE, longlat=FALSE, tol.loc=.Machine$double.eps^0.25, tol.bw=.Machine$double.eps^0.25, parallel=FALSE, alpha=1, precondition=FALSE, interact=FALSE, shrunk.fit=TRUE, bw.select=c('AICc','GCV','BICg'), resid.type=c('deviance','pearson')) {
     if (is.null(longlat) || !is.logical(longlat)) 
         longlat <- FALSE
     if (missing(coords)) 
@@ -25,8 +24,11 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         stop("negative weights")
     y <- model.extract(mf, "response")
 
-        
-        
+    bw.method = match.arg(bw.method)
+    mode.select = match.arg(mode.select)
+    bw.select = match.arg(bw.select)
+    resid.type = match.arg(resid.type)
+    
     if (!is.null(range)) {
         beta1 = min(range)
         beta2 = max(range)

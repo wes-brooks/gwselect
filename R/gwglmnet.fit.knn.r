@@ -18,8 +18,8 @@ gwglmnet.fit.knn = function(x, y, family, coords, fit.loc, oracle, D, verbose, m
         loc = coords.unique[i,]
         dist = drop(D[i,])
 
-        opt = optimize(gwglmnet.knn, lower=beta1, upper=beta2, 
-            maximum=FALSE, tol=tol.loc, coords=coords, loc=loc, indx=indx,
+        opt = optimize(gwglmnet.knn, lower=beta1, upper=beta2, maximum=FALSE, tol=tol.loc,
+            coords=coords, loc=loc, indx=indx,
             gweight=gweight, verbose=verbose, dist=dist, total.weight=total.weight,
             prior.weights=prior.weights, target=target)
         bandwidth = opt$minimum
