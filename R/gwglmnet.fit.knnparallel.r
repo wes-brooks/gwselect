@@ -1,4 +1,4 @@
-gwglmnet.fit.knnparallel = function(x, y, family, coords, fit.loc, oracle, D, verbose, mode.select, prior.weights, tuning, predict, simulation, indx, gweight, target, beta1, beta2, tol.loc, longlat=FALSE, precondition=FALSE, N, interact, alpha, shrunk.fit) {
+gwglmnet.fit.knnparallel = function(x, y, family, coords, fit.loc, oracle, D, verbose, mode.select, prior.weights, tuning, predict, simulation, indx, gweight, target, beta1, beta2, tol.loc, longlat=FALSE, precondition=FALSE, N, interact, alpha, shrunk.fit, resid.type) {
     if (!is.null(fit.loc)) {
         coords.unique = unique(fit.loc)
     } else {
