@@ -198,18 +198,13 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                     coefs.unshrunk = rep(0, ncol(x) + 1)
                     coefs.unshrunk[c(1, varset + 1)] = coef(m)
                     s2.unshrunk = sum(w[permutation]*m$residuals**2)/sum(w[permutation])
-
-                    se.unshrunk = rep(0, ncol(x) + 1)
-                    se.unshrunk[c(1, varset + 1)] = summary(m)$coefficients[,'Std. Error']
                 } else {
                     modeldata = data.frame(y=yy[permutation], xxx)
                     m = glm(y~1, data=modeldata, weights=w[permutation], family=family)
+                    
                     coefs.unshrunk = rep(0, ncol(xx) + 1)
                     coefs.unshrunk[1] = sum(fity * w[permutation]) / sum(w[permutation])
-                    
                     s2.unshrunk = sum((sqrt(w[permutation])*fity)**2)/sum(w[permutation])
-                    se.unshrunk = rep(0, ncol(xx) + 1)
-                    se.unshrunk[1] = sqrt(s2.unshrunk)
 
                     Hii = 1 / sum(w[permutation])
                 }
@@ -278,24 +273,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
             if (length(coefs)>1) {coefs[1] = mean(sqrt(w[permutation])*fity) - sum(coefs[2:length(coefs)] * drop(sqrt(w[permutation]) %*% xxx) / nrow(xxx))}
     
             coefs.unshrunk = Matrix(coefs.unshrunk[1:(ncol(x)+1)], ncol=1)
-            rownames(coefs.unshrunk) = c("(Intercept)", oldnames)
-
-            se.unshrunk = Matrix(se.unshrunk[1:(ncol(x)+1)], ncol=1)
-            rownames(se.unshrunk) = c("(Intercept)", oldnames)
-       
-            #if (interact) {
-            #	se.unshrunk.interacted = Matrix(se.unshrunk.interacted, ncol=1)
-			#	rownames(se.unshrunk.interacted) = c("(Intercept)", colnames(xx.interacted))
-            #
-            #    locmat = t(as.matrix(cbind(rep(1,nrow(loc)),loc)))
-            #    cc = Matrix(0, nrow=(length(se.unshrunk.interacted)-1-length(oldnames))/2, ncol=3)
-            #    cc[,1] = se.unshrunk.interacted[seq(2, 1+length(oldnames))]**2
-            #    cc[,2] = se.unshrunk.interacted[seq(2+length(oldnames), length(se.unshrunk.interacted)-1, by=2)]**2
-            #    cc[,3] = se.unshrunk.interacted[seq(2+length(oldnames), length(se.unshrunk.interacted)-1, by=2)+1]**2           
-            #    ccc = sqrt(cc %*% locmat)
-            #    se.unshrunk.interacted = Matrix(c(se.unshrunk.interacted[1], as.vector(ccc)))
-            #    rownames(se.unshrunk.interacted) =  c("(Intercept)", oldnames)
-            #}     
+            rownames(coefs.unshrunk) = c("(Intercept)", oldnames)  
     
             coef.unshrunk.list[[i]] = coefs.unshrunk
             coef.list[[i]] = coefs
@@ -307,7 +285,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
     } else if (predict) {
         return(list(tunelist=tunelist, coef=coefs, weightsum=sum(w), s=s.optimal, sigma2=s2, nonzero=colnames(x)[vars[[s.optimal]]]))
     } else if (simulation) {
-        return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, se.unshrunk=se.unshrunk, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
+        return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
     } else {
         return(list(model=model, loss=loss, coef=coefs, coef.unshrunk=coefs.unshrunk, coeflist=coef.list, nonzero=colnames(x)[vars[[s.optimal]]], s=s.optimal, loc=loc, bw=bw, meanx=meanx, meany=meany, coef.scale=adapt.weight/normx, df=df, loss.local=loss.local, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
     }

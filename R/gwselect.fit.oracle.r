@@ -85,12 +85,6 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
     	if (i==N) { 
 	    	if (sum(w) > dim(permuted)[2])  {  		
 				s2 = sum(w[permutation] * model$residuals**2)/(sum(w) - df)
-	
-				#Get standard errors of the coefficient estimates:
-				se.coef = rep(0, ncol(x)+1)
-                names(se.coef) = c("(Intercept)", colnames(x))
-				se.coef[c(1, oracle)] = summary(model)$coefficients[,'Std. Error'][c("(Intercept)", oracle)]
-				se.coef = Matrix(se.coef, ncol=1)
 
 				#Find the local loss (for tuning bw)
 				if (mode.select=='CV') {
@@ -151,7 +145,6 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
 				loss.local = Inf
 				fitted = NA
 				s2 = NA
-				se.coef = NA
 				coef.list = NA
 				coefs = NA
 			}
@@ -164,7 +157,7 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
     } else if (predict) {
         return(list(tunelist=tunelist, coef=coefs))
     } else if (simulation) {
-        return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, bw=bw, sigma2=s2, se.coef=se.coef, fitted=fitted[colocated][1], nonzero=oracle, weightsum=sum(w), s=NULL))
+        return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, bw=bw, sigma2=s2, fitted=fitted[colocated][1], nonzero=oracle, weightsum=sum(w), s=NULL))
     } else {
         return(list(model=model, coef=coefs, coeflist=coef.list, loc=loc, bw=bw, tunelist=tunelist, sigma2=s2, nonzero=oracle, sum.weights=sum(w), N=N))
     }
