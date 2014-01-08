@@ -1,4 +1,4 @@
-gwglmnet.fit.fixedbwparallel = function(x, y, family, coords, fit.loc=NULL, indx=NULL, bw, D=NULL, s=NULL, oracle, verbose=FALSE, mode.select, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat, adapt, precondition, alpha, simulation, tuning, predict, interact, N, shrunk.fit, AICc) {
+gwglmnet.fit.fixedbwparallel = function(x, y, family, coords, fit.loc=NULL, indx=NULL, bw, D=NULL, oracle, verbose=FALSE, mode.select, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat, precondition, alpha, simulation, tuning, predict, interact, N, shrunk.fit, resid.type) {
     if (!is.null(fit.loc)) {
         coords.unique = fit.loc
     } else {
@@ -24,9 +24,9 @@ gwglmnet.fit.fixedbwparallel = function(x, y, family, coords, fit.loc=NULL, indx
         gw = gweights[[i]]
 		
 		if (is.null(oracle)) {
-	        m = gwglmnet.fit.inner(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, s=s, verbose=verbose, mode.select=mode.select, gwr.weights=gw, prior.weights=prior.weights, gweight=gweight, adapt=adapt, precondition=precondition, predict=predict, tuning=tuning, simulation=simulation, alpha=alpha, interact=interact, N=N, shrunk.fit=shrunk.fit, AICc=AICc)
+	        m = gwglmnet.fit.inner(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, verbose=verbose, mode.select=mode.select, gwr.weights=gw, prior.weights=prior.weights, gweight=gweight, precondition=precondition, predict=predict, tuning=tuning, simulation=simulation, alpha=alpha, interact=interact, N=N, shrunk.fit=shrunk.fit)
 		} else {
-            m = gwselect.fit.oracle(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, gwr.weights=gw, prior.weights=prior.weights, gweight=gweight, AICc=AICc)
+            m = gwselect.fit.oracle(x=x, y=y, family=family, bw=bw, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, gwr.weights=gw, prior.weights=prior.weights, gweight=gweight)
         }
         
         if (verbose) {
@@ -42,7 +42,6 @@ gwglmnet.fit.fixedbwparallel = function(x, y, family, coords, fit.loc=NULL, indx
     } else if (simulation) {
     } else {
 	    gwglmnet.object[['coords']] = coords
-    	gwglmnet.object[['s.range']] = s
 	}
 	
     class(gwglmnet.object) = 'gwglmnet.object'

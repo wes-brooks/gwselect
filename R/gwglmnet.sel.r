@@ -1,6 +1,4 @@
-gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, coords, oracle=NULL, indx=NULL, adapt=FALSE, gweight=gwr.Gauss, s=NULL, method="dist", mode.select='AIC', verbose=FALSE, longlat=FALSE, tol=.Machine$double.eps^0.25, parallel=FALSE, alpha=1, precondition=FALSE, interact=FALSE, shrunk.fit=TRUE, AICc=FALSE) {
-    if (!is.logical(adapt)) 
-        stop("adapt must be logical")
+gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, coords, oracle=NULL, indx=NULL, gweight=gwr.Gauss, bw.method=c('dist','knn','nen'), mode.select=c('AIC','BIC','CV'), verbose=FALSE, longlat=FALSE, tol.loc=.Machine$double.eps^0.25, tol.bw=.Machine$double.eps^0.25, parallel=FALSE, alpha=1, precondition=FALSE, interact=FALSE, shrunk.fit=TRUE, bw.select=c('AICc','GCV','BICg'), resid.type=c('deviance','pearson')) {
     if (is.null(longlat) || !is.logical(longlat)) 
         longlat <- FALSE
     if (missing(coords)) 
@@ -26,23 +24,26 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         stop("negative weights")
     y <- model.extract(mf, "response")
 
-        
-        
+    bw.method = match.arg(bw.method)
+    mode.select = match.arg(mode.select)
+    bw.select = match.arg(bw.select)
+    resid.type = match.arg(resid.type)
+    
     if (!is.null(range)) {
         beta1 = min(range)
         beta2 = max(range)
     } else {
-        if (method == "dist") {
+        if (bw.method == "dist") {
             bbox <- cbind(range(coords[, 1]), range(coords[, 2]))
             difmin <- spDistsN1(bbox, bbox[2, ], longlat)[1]
             if (any(!is.finite(difmin))) 
                 difmin[which(!is.finite(difmin))] <- 0
             beta1 <- difmin/1000
             beta2 <- 10*difmin
-        } else if (method == 'knn') {
+        } else if (bw.method == 'knn') {
             beta1 <- 0
             beta2 <- 1
-        } else if (method == 'nen') {
+        } else if (bw.method == 'nen') {
             if (family=='binomial') {beta2 = sum(weights/(mean(y)*(1-mean(y))) * (y-mean(y))**2)}
             else if (family=='poisson') {beta2 = sum(weights/(mean(y)) * (y-mean(y))**2)}
             else if (family=='gaussian') {beta2 = sum(weights * (y-mean(y))**2)}
@@ -50,15 +51,17 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         }
     }
 
+    #Create a new environment, in which we will store the likelihood trace from bandwidth selection.
     oo = new.env()
-    opt <- optimize(gwglmnet.cv.f, interval=c(beta1, beta2), 
-        maximum=FALSE, formula=formula, indx=indx, coords=coords, env=oo, oracle=oracle, s=s, family=family, mode.select=mode.select,
-        gweight=gweight, verbose=verbose, longlat=longlat, data=data, method=method, alpha=alpha, shrunk.fit=shrunk.fit,
-        weights=weights, tol=tol, adapt=adapt, parallel=parallel, precondition=precondition, N=1, interact=interact, AICc=AICc)
+    opt <- optimize(gwglmnet.cv.f, interval=c(beta1, beta2), tol=tol.bw, maximum=FALSE,
+        formula=formula, indx=indx, coords=coords, env=oo, oracle=oracle, family=family, mode.select=mode.select,
+        gweight=gweight, verbose=verbose, longlat=longlat, data=data, bw.method=bw.method, alpha=alpha, shrunk.fit=shrunk.fit,
+        weights=weights, tol.loc=tol.loc, parallel=parallel, precondition=precondition, N=1, interact=interact,
+        resid.type=resid.type, bw.select=bw.select)
     trace = oo$trace
     rm(oo)
 
     bdwt <- opt$minimum
     res <- bdwt
-    return(list(bw=res, trace=trace))
+    return(list(bw=res, trace=trace, bw.select=bw.select, resid.type=resid.type))
 }

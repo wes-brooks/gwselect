@@ -1,4 +1,4 @@
-gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='gaussian', dist=NULL, oracle=NULL, tuning=FALSE, predict=FALSE, simulation=FALSE, verbose=FALSE, interact=FALSE, mode.select, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, N=N, AICc) {
+gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='gaussian', dist=NULL, oracle=NULL, tuning=FALSE, predict=FALSE, simulation=FALSE, verbose=FALSE, interact=FALSE, mode.select, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, N=N) {
     if (!is.null(indx)) {
         colocated = which(round(coords[indx,1],5)==round(as.numeric(loc[1]),5) & round(coords[indx,2],5) == round(as.numeric(loc[2]),5))
     }
@@ -36,8 +36,8 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
     }
 
     ssr.local = NA
-    df = ncol(xx) + 1
-	#xx = as.matrix(x)
+    df = length(oracle) + 1
+    
     yy = as.matrix(y)    
     w <- prior.weights * gwr.weights
     
@@ -57,6 +57,7 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
     
     int.list = list()
     coef.list = list()
+    tunelist = list()
     
     for (i in 1:N) {
         #Final permutation is the original ordering of the data:
@@ -69,7 +70,7 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
         permuted = data.frame(fitdata[permutation,])
         colnames(permuted) = colnames(fitdata)
 
-        model = glm(y~., data=permuted, weights=w, family=family)
+        model = glm(y~., data=permuted, weights=w[permutation], family=family)
         colocated = which(gwr.weights[weighted][permutation]==1)
         yyy = yy[permutation]
                 
@@ -83,13 +84,7 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
     
     	if (i==N) { 
 	    	if (sum(w) > dim(permuted)[2])  {  		
-				s2 = sum(w[permutation]*model$residuals^2)/(sum(w) - dim(permuted)[2] - 1)
-	
-				#Get standard errors of the coefficient estimates:
-				se.coef = rep(0, ncol(x)+1)
-                names(se.coef) = c("(Intercept)", colnames(x))
-				se.coef[c(1, oracle)] = summary(model)$coefficients[,'Std. Error'][c("(Intercept)", oracle)]
-				se.coef = Matrix(se.coef, ncol=1)
+				s2 = sum(w[permutation] * model$residuals**2)/(sum(w) - df)
 
 				#Find the local loss (for tuning bw)
 				if (mode.select=='CV') {
@@ -99,21 +94,49 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
                     if (mode.select=='AIC') {penalty=2}
                     else if (mode.select=='BIC') {penalty=log(sum(w[permutation]))}
 
-					fitted = predict(model, newdata=localdata, type='response')
-					s2 = sum(w[permutation]*model$residuals**2) / (sum(w) - ncol(xx) - 1)   
+					fitted = predict(model, newdata=permuted, type='response')
 				    Xh = diag(sqrt(w[permutation])) %*% as.matrix(cbind(rep(1,length(permutation)), xx))
                     H = Xh %*% solve(t(Xh) %*% Xh) %*% t(Xh)
                     Hii = sum(H[colocated,colocated])
 
 					if (length(colocated)>0) {
-						if (!AICc) {loss.local = log(s2) + penalty*df/sum(w)}
-						else {
-                            loss.local = Hii
-                            ssr.local = sum((w[permutation]*model$residuals**2)[colocated])
-                            if (family=='gaussian') {ssr.local = sum((w[permutation]*(fitted - yy[permutation])**2)[colocated])}
-                            else if (family=='poisson') {ssr.local = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])}
-                            else if (family=='binomial') {ssr.local = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])}
+					    tunelist[['ssr-loc']] = list()
+                        tunelist[['ssr']] = list()
+                    
+                        #Pearson residuals:
+                        if (family=='gaussian') {
+                            tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
+                            tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2)
+                        } else if (family=='poisson') {
+                            tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/fitted)[colocated])
+                            tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/fitted)
+                        } else if (family=='binomial') {
+                            tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/(fitted*(1-fitted)))[colocated])
+                            tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/(fitted*(1-fitted)))
                         }
+
+                        #Deviance residuals:
+                        if (family=='gaussian') {
+                            tunelist[['ssr-loc']][['deviance']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
+                            tunelist[['ssr']][['deviance']] = sum(w[permutation]*(fitted - yyy)**2)
+                        } else if (family=='poisson') {
+                            tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])
+                            tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))
+                        } else if (family=='binomial') {
+                            tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])
+                            tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))
+                        }
+
+                        if (family=='gaussian') {
+                            tunelist[['s2']] = s2
+                        } else if (family=='poisson') { 
+                            tunelist[['s2']] = summary(model)$dispersion
+                        } else if (family=='binomial') {
+                            tunelist[['s2']] = 1
+                        }
+                        tunelist[['n']] = sum(w[permutation])
+                        tunelist[['trace.local']] = Hii
+                        tunelist[['df']] = df
 					} else {
 						loss.local = NA
 					}	
@@ -122,7 +145,6 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
 				loss.local = Inf
 				fitted = NA
 				s2 = NA
-				se.coef = NA
 				coef.list = NA
 				coefs = NA
 			}
@@ -131,12 +153,12 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
     
     #Return the results
     if (tuning) {
-        return(list(loss.local=drop(loss.local), ssr.local=ssr.local, s=NULL, sigma2=s2, nonzero=oracle, weightsum=sum(w)))
+        return(list(tunelist=tunelist, s=NULL, sigma2=s2, nonzero=oracle, weightsum=sum(w)))
     } else if (predict) {
-        return(list(loss.local=drop(loss.local), coef=coefs))
+        return(list(tunelist=tunelist, coef=coefs))
     } else if (simulation) {
-        return(list(loss.local=drop(loss.local), coef=coefs, coeflist=coef.list, bw=bw, sigma2=s2, se.coef=se.coef, fitted=fitted[1], nonzero=oracle, weightsum=sum(w), s=NULL))
+        return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, bw=bw, sigma2=s2, fitted=fitted[colocated][1], nonzero=oracle, weightsum=sum(w), s=NULL))
     } else {
-        return(list(model=model, coef=coefs, coeflist=coef.list, loc=loc, bw=bw, loss.local=drop(loss.local), sigma2=s2, nonzero=oracle, sum.weights=sum(w), N=N))
+        return(list(model=model, coef=coefs, coeflist=coef.list, loc=loc, bw=bw, tunelist=tunelist, sigma2=s2, nonzero=oracle, sum.weights=sum(w), N=N))
     }
 }
