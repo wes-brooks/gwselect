@@ -142,8 +142,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
     
         if (mode.select=='CV') {
             predx = matrix(xx[colocated,], reps, dim(xs)[2])    
-            vars = apply(predict(model, type='coef')[['coefficients']], 1, function(x) {which(abs(x)>0)})
-            df = sapply(vars, length) + 1                        
+            vars = apply(as.matrix(coef(model)[-1,]), 2, function(x) {which(abs(x)>0)})
+            df = sapply(vars, length) + 1
 
             predictions = predict(model, newx=predx, type='fit', mode='step')[['fit']]
             loss = colSums(abs(matrix(predictions - matrix(y[colocated], nrow=reps, ncol=nsteps), nrow=reps, ncol=nsteps)))                
