@@ -58,7 +58,7 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
         gweight=gweight, verbose=verbose, longlat=longlat, data=data, bw.method=bw.method, alpha=alpha, shrunk.fit=shrunk.fit,
         weights=weights, tol.loc=tol.loc, parallel=parallel, precondition=precondition, N=1, interact=interact,
         resid.type=resid.type, bw.select=bw.select)
-    trace = oo$trace
+    trace = oo$trace[!duplicated(oo$trace[,1]),]
     rm(oo)
 
     bdwt <- opt$minimum

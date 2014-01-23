@@ -166,7 +166,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                 
                 #Compute the loss (varies by family)
                 loss = as.vector(deviance(model) + penalty*df)
-                
+print(loss)
+print(vars)                
                 #Pick the lambda that minimizes the loss:
                 k = which.min(loss)
                 fitted = fitted[,k]
