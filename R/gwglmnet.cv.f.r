@@ -9,7 +9,8 @@ gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweig
         shrunk.fit=shrunk.fit, resid.type=resid.type)
     
     if (bw.select=='AICc') {
-        trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)}))
+        #trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)}))
+       	trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['df-local']],1)}))
        	loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']][['ssr-loc']][[resid.type]]}))) + 1 + (2*(trH+1))/(nrow(data)-trH-2) + log(2*pi))
     } else if (bw.select=='GCV') {
         trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)})) 

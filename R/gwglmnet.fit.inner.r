@@ -166,8 +166,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                 
                 #Compute the loss (varies by family)
                 loss = as.vector(deviance(model) + penalty*df)
-print(loss)
-print(vars)                
+                
                 #Pick the lambda that minimizes the loss:
                 k = which.min(loss)
                 fitted = fitted[,k]
@@ -194,7 +193,7 @@ print(vars)
                         fitted = m$fitted
                         localfit = fitted[colocated]
                         df = length(varset) + 1
-                        s2 = sum((w[permutation]*m$residuals**2) / (sum(w) - df))
+                        s2 = sum((w[permutation]*m$residuals**2) / (sum(w[permutation]) - df))
                     }
                     coefs.unshrunk = rep(0, ncol(x) + 1)
                     coefs.unshrunk[c(1, varset + 1)] = coef(m)
@@ -248,6 +247,7 @@ print(vars)
                     tunelist[['n']] = sum(w[permutation])
                     tunelist[['trace.local']] = Hii
                     tunelist[['df']] = df
+                    tunelist[['df-local']] = df*w[permutation][colocated] / sum(w[permutation])
                 } else {
                     loss.local = NA
                 }                   
