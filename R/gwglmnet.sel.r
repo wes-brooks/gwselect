@@ -1,4 +1,4 @@
-gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, coords, oracle=NULL, indx=NULL, gweight=gwr.Gauss, bw.method=c('dist','knn','nen'), mode.select=c('AIC','BIC','CV'), verbose=FALSE, longlat=FALSE, tol.loc=.Machine$double.eps^0.25, tol.bw=.Machine$double.eps^0.25, parallel=FALSE, alpha=1, precondition=FALSE, interact=FALSE, shrunk.fit=TRUE, bw.select=c('AICc','GCV','BICg'), resid.type=c('deviance','pearson')) {
+gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, coords, oracle=NULL, indx=NULL, gweight=gwr.Gauss, bw.method=c('dist','knn','nen'), mode.select=c('AIC','BIC','CV','AICc'), verbose=FALSE, longlat=FALSE, tol.loc=.Machine$double.eps^0.25, tol.bw=.Machine$double.eps^0.25, parallel=FALSE, alpha=1, precondition=FALSE, interact=FALSE, shrunk.fit=TRUE, bw.select=c('AICc','GCV','BICg'), resid.type=c('deviance','pearson')) {
     if (is.null(longlat) || !is.logical(longlat)) 
         longlat <- FALSE
     if (missing(coords)) 

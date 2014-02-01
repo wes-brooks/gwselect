@@ -1,4 +1,4 @@
-gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, indx=NULL, tuning=FALSE, predict=FALSE, simulation=FALSE, oracle=NULL, gweight, bw=NULL, mode.select=c('AIC','BIC','CV'), verbose=FALSE, longlat, tol.loc=NULL, N=1, bw.method=c('dist','knn','nen'), parallel=FALSE, precondition=FALSE, D=NULL, interact=FALSE, alpha=1, shrunk.fit=TRUE, resid.type=c('deviance','pearson')) {
+gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, indx=NULL, tuning=FALSE, predict=FALSE, simulation=FALSE, oracle=NULL, gweight, bw=NULL, mode.select=c('AIC','BIC','CV','AICc'), verbose=FALSE, longlat, tol.loc=NULL, N=1, bw.method=c('dist','knn','nen'), parallel=FALSE, precondition=FALSE, D=NULL, interact=FALSE, alpha=1, shrunk.fit=TRUE, resid.type=c('deviance','pearson')) {
     if (is(data, "Spatial")) {
         if (!missing(coords)) 
             warning("data is Spatial* object, ignoring coords argument")

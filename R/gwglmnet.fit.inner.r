@@ -150,8 +150,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
             s2 = sum(w*(fitted[,nsteps] - as.matrix(y))**2) / (sum(w)-df-1)
 
             loss.local = loss        
-        } else if (mode.select=='AIC' | mode.select=='BIC') {
-            if (mode.select=='AIC') { penalty = 2 }
+        } else if (mode.select %in% c('AIC', 'BIC', 'AICc')) {
+            if (mode.select %in% c('AIC', 'AICc')) { penalty = 2 }
             if (mode.select=='BIC') { penalty = log(sum(w[permutation])) }
             predx = t(apply(xx[permutation,], 1, function(X) {(X-meanx) * adapt.weight / normx}))
             predy = as.matrix(yy[permutation])
@@ -166,6 +166,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                 
                 #Compute the loss (varies by family)
                 loss = as.vector(deviance(model) + penalty*df)
+                if (mode.select=='AICc') {loss = loss + 2*df(df-1)/(sum(w[permutation]) - df - 1)}
                 
                 #Pick the lambda that minimizes the loss:
                 k = which.min(loss)
