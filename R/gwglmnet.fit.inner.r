@@ -24,9 +24,9 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
 	}
 
     #For interaction on location:
+    oldnames = colnames(x)
     if (interact) {
         newnames = vector()
-        oldnames = colnames(x)
         for (l in 1:length(oldnames)) {
             newnames = c(newnames, paste(oldnames[l], ":", colnames(coords)[1], sep=""))
             newnames = c(newnames, paste(oldnames[l], ":", colnames(coords)[2], sep=""))
