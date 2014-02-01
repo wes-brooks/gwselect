@@ -166,7 +166,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                 
                 #Compute the loss (varies by family)
                 loss = as.vector(deviance(model) + penalty*df)
-                if (mode.select=='AICc') {loss = loss + 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
+                if (mode.select=='AICc') {print("here."); loss = loss + 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
                 
                 #Pick the lambda that minimizes the loss:
                 k = which.min(loss)
