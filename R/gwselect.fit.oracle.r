@@ -137,6 +137,7 @@ gwselect.fit.oracle = function(x, y, coords, indx=NULL, loc, bw=NULL, family='ga
                         tunelist[['n']] = sum(w[permutation])
                         tunelist[['trace.local']] = Hii
                         tunelist[['df']] = df
+                        tunelist[['df-local']] = df*w[permutation][colocated] / sum(w[permutation])
 					} else {
 						loss.local = NA
 					}	
