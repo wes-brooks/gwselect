@@ -130,7 +130,6 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         #fitx = xs
         #fity = yyy
         
-        
         model = aglasso_R(x=xxx, y=yyy, w=w[permutation], groups=groups)
         nsteps = length(model$lambda) + 1   
     
@@ -139,12 +138,12 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         if (mode.select=='BIC') { penalty = log(sum(w[permutation])) }
         #predx = t(apply(xx[permutation,], 1, function(X) {(X-meanx) * adapt.weight / normx}))
         #predy = as.matrix(yy[permutation])
-        vars = apply(as.matrix(coef(model)[-1,]), 2, function(x) {which(abs(x)>0)})
+        vars = apply(as.matrix(model[['coefs']][-1,]), 2, function(x) {which(abs(x)>0)})
         df = sapply(vars, length) + 1
 
         if (sum(w) > ncol(x)) {
             #Extract the fitted values for each lambda:
-            coefs = t(as.matrix(coef(model)))
+            coefs = t(as.matrix(model[['coefs']]))
             fitted = model[['fitted']] #predict(model, newx=predx, type="response")   
             s2 = sum(w[permutation]*(model[['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
             
