@@ -24,6 +24,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
 	}
 
     #For interaction on location:
+    groups = 0:(ncol(x)-1)
     oldnames = colnames(x)
     if (interact) {
         newnames = vector()
@@ -35,6 +36,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         for (k in 1:ncol(x)) {
             interacted[,2*(k-1)+1] = x[,k]*(coords[,1]-loc[1,1])
             interacted[,2*k] = x[,k]*(coords[,2]-loc[1,2])
+            groups = c(groups, groups[k], groups[k])
         }
         x.interacted = cbind(x, interacted)
         colnames(x.interacted) = c(oldnames, newnames)
@@ -87,178 +89,159 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         sqrt.w <- diag(sqrt(w[permutation]))
 
         xxx = xx[permutation,]
-        yyy = yy[permutation]
-        meany = sum((w*yy)[permutation])/sum(w)
-
-        if (precondition==TRUE) {
-            s = svd(xxx)
-            F = s$u  %*% diag(1/sqrt(s$d**2 + tau))  %*%  t(s$u)
-            xxx = F %*% xxx
-            yyy = F %*% yyy
-        }
-    
-        one <- rep(1, nrow(xxx))
-        meanx <- drop(one %*% xxx) / nrow(xxx)
-        x.centered <- scale(xxx, meanx, FALSE)         # first subtracts mean
-        normx <- sqrt(drop(one %*% (x.centered**2)))
-        names(normx) <- NULL
-        xs = x.centered
-        
-        for (k in 1:dim(x.centered)[2]) {
-            if (normx[k]!=0) {
-                xs[,k] = xs[,k] / normx[k]
-            } else {
-                xs[,k] = rep(0, dim(xs)[1])
-                normx[k] = Inf #This should allow the lambda-finding step to work.
-            }
-        }
-        
-        glm.step = try(glm(yyy~xs, weights=w[permutation], family=family))
-    
-        if("try-error" %in% class(glm.step)) { 
-            cat(paste("Couldn't make a model for finding the SSR at location ", i, ", bandwidth ", bw, "\n", sep=""))
-            return(return(list(loss.local=Inf, resid=Inf)))
-        }
-        
-        beta.glm = glm.step$coeff[-1]                   # mle except for intercept
-        adapt.weight = abs(beta.glm)               # weights for adaptive lasso
-        for (k in 1:dim(x.centered)[2]) {
-            if (!is.na(adapt.weight[k])) {
-                xs[,k] = xs[,k] * adapt.weight[k]
-            } else {
-                xs[,k] = rep(0, dim(xs)[1])
-                adapt.weight[k] = 0 #This should allow the lambda-finding step to work.
-            }
-        }
-    
-        fitx = xs
-        fity = yyy
         if (interact) {xxx = xx.interacted[permutation,]}
-
-		if (family == 'binomial') { model = glmnet(x=fitx, y=cbind(1-fity, fity), standardize=FALSE, intercept=TRUE, family=family, weights=w[permutation], alpha=alpha) }
-        else if (family=='cox') { model = glmnet(x=fitx, y=as.matrix(cbind(fity, event)), standardize=FALSE, intercept=TRUE, family=family, weights=w[permutation], alpha=alpha) }
-        else { model = glmnet(x=fitx, y=fity, standardize=FALSE, intercept=TRUE, family=family, weights=w[permutation], alpha=alpha) }
+        yyy = yy[permutation]
+        #meany = sum((w*yy)[permutation])/sum(w)
+        #
+        #one <- rep(1, nrow(xxx))
+        #meanx <- drop(one %*% xxx) / nrow(xxx)
+        #x.centered <- scale(xxx, meanx, FALSE)         # first subtracts mean
+        #normx <- sqrt(drop(one %*% (x.centered**2)))
+        #names(normx) <- NULL
+        #xs = x.centered
+        #
+        #for (k in 1:dim(x.centered)[2]) {
+        #    if (normx[k]!=0) {
+        #        xs[,k] = xs[,k] / normx[k]
+        #    } else {
+        #        xs[,k] = rep(0, dim(xs)[1])
+        #        normx[k] = Inf #This should allow the lambda-finding step to work.
+        #    }
+        #}
+        #
+        #glm.step = try(glm(yyy~xs, weights=w[permutation], family=family))
+        #
+        #if("try-error" %in% class(glm.step)) { 
+        #    cat(paste("Couldn't make a model for finding the SSR at location ", i, ", bandwidth ", bw, "\n", sep=""))
+        #    return(return(list(loss.local=Inf, resid=Inf)))
+        #}
+        #
+        #beta.glm = glm.step$coeff[-1]                   # mle except for intercept
+        #adapt.weight = abs(beta.glm)               # weights for adaptive lasso
+        #for (k in 1:dim(x.centered)[2]) {
+        #    if (!is.na(adapt.weight[k])) {
+        #        xs[,k] = xs[,k] * adapt.weight[k]
+        #    } else {
+        #        xs[,k] = rep(0, dim(xs)[1])
+        #        adapt.weight[k] = 0 #This should allow the lambda-finding step to work.
+        #    }
+        #}
+        #
+        #fitx = xs
+        #fity = yyy
+        
+        
+        model = aglasso_R(x=xxx, y=yyy, w=w[permutation], groups=groups)
         nsteps = length(model$lambda) + 1   
     
-        if (mode.select=='CV') {
-            predx = matrix(xx[colocated,], reps, dim(xs)[2])    
-            vars = apply(as.matrix(coef(model)[-1,]), 2, function(x) {which(abs(x)>0)})
-            df = sapply(vars, length) + 1
+    
+        if (mode.select %in% c('AIC', 'AICc')) { penalty = 2 }
+        if (mode.select=='BIC') { penalty = log(sum(w[permutation])) }
+        #predx = t(apply(xx[permutation,], 1, function(X) {(X-meanx) * adapt.weight / normx}))
+        #predy = as.matrix(yy[permutation])
+        vars = apply(as.matrix(coef(model)[-1,]), 2, function(x) {which(abs(x)>0)})
+        df = sapply(vars, length) + 1
 
-            predictions = predict(model, newx=predx, type='fit', mode='step')[['fit']]
-            loss = colSums(abs(matrix(predictions - matrix(y[colocated], nrow=reps, ncol=nsteps), nrow=reps, ncol=nsteps)))                
-            s2 = sum(w*(fitted[,nsteps] - as.matrix(y))**2) / (sum(w)-df-1)
-
-            loss.local = loss        
-        } else if (mode.select %in% c('AIC', 'BIC', 'AICc')) {
-            if (mode.select %in% c('AIC', 'AICc')) { penalty = 2 }
-            if (mode.select=='BIC') { penalty = log(sum(w[permutation])) }
-            predx = t(apply(xx[permutation,], 1, function(X) {(X-meanx) * adapt.weight / normx}))
-            predy = as.matrix(yy[permutation])
-            vars = apply(as.matrix(coef(model)[-1,]), 2, function(x) {which(abs(x)>0)})
-            df = sapply(vars, length) + 1
-
-            if (sum(w) > ncol(x)) {
-                #Extract the fitted values for each lambda:
-                coefs = t(as.matrix(coef(model)))
-                fitted = predict(model, newx=predx, type="response")   
-                s2 = sum(w[permutation]*(fitted[,ncol(fitted)] - predy)**2) / (sum(w) - df) 
-                
-                #Compute the loss (varies by family)
-                loss = as.vector(deviance(model) + penalty*df)
-                if (mode.select=='AICc') {loss = loss + 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
-                
-                #Pick the lambda that minimizes the loss:
-                k = which.min(loss)
-                fitted = fitted[,k]
-                localfit = fitted[colocated]
-                df = df[k]
-                if (k > 1) {
-                    varset = vars[[k]]
-                    if (interact) {
-						for (j in vars[[k]]) {
-							varset = c(varset, ncol(x)+2*(j-1)+1, ncol(x)+2*j)
-						}
+        if (sum(w) > ncol(x)) {
+            #Extract the fitted values for each lambda:
+            coefs = t(as.matrix(coef(model)))
+            fitted = model[['fitted']] #predict(model, newx=predx, type="response")   
+            s2 = sum(w[permutation]*(model[['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
+            
+            #Compute the loss (varies by family)
+            loss = as.vector(model[['deviance']] + penalty*df)
+            if (mode.select=='AICc') {loss = loss + 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
+            
+            #Pick the lambda that minimizes the loss:
+            k = which.min(loss)
+            fitted = fitted[,k]
+            localfit = fitted[colocated]
+            df = df[k]
+            if (k > 1) {
+                varset = vars[[k]]
+                if (interact) {
+                    for (j in vars[[k]]) {
+                        varset = c(varset, ncol(x)+2*(j-1)+1, ncol(x)+2*j)
                     }
-                    modeldata = data.frame(y=yy[permutation], xxx[,varset])
-                    m = glm(y~., data=modeldata, weights=w[permutation], family=family)
-                    working.weights = as.vector(m$weights)
-                    result = tryCatch({
-                        Xh = diag(sqrt(working.weights)) %*% as.matrix(cbind(rep(1,length(permutation)), xxx[,varset]))
-                        H = Xh %*% solve(t(Xh) %*% Xh) %*% t(Xh)
-                        Hii = H[colocated,colocated]
-                    }, error = function(e) {
-                        Hii = nrow(x) - 2
-                    })
-                    if (!shrunk.fit) {
-                        fitted = m$fitted
-                        localfit = fitted[colocated]
-                        df = length(varset) + 1
-                        s2 = sum((w[permutation]*m$residuals**2) / (sum(w[permutation]) - df))
-                    }
-                    coefs.unshrunk = rep(0, ncol(x) + 1)
-                    coefs.unshrunk[c(1, varset + 1)] = coef(m)
-                    s2.unshrunk = sum(w[permutation]*m$residuals**2)/sum(w[permutation])
-                } else {
-                    modeldata = data.frame(y=yy[permutation], xxx)
-                    m = glm(y~1, data=modeldata, weights=w[permutation], family=family)
-                    
-                    coefs.unshrunk = rep(0, ncol(xx) + 1)
-                    coefs.unshrunk[1] = sum(fity * w[permutation]) / sum(w[permutation])
-                    s2.unshrunk = sum((sqrt(w[permutation])*fity)**2)/sum(w[permutation])
-
-                    Hii = 1 / sum(w[permutation])
                 }
-                
-                if (length(colocated)>0) {
-                    tunelist[['ssr-loc']] = list()
-                    tunelist[['ssr']] = list()
-                    
-                    #Pearson residuals:
-                    if (family=='gaussian') {
-                        tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
-                        tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2)
-                    } else if (family=='poisson') {
-                        tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/fitted)[colocated])
-                        tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/fitted)
-                    } else if (family=='binomial') {
-                        tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/(fitted*(1-fitted)))[colocated])
-                        tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/(fitted*(1-fitted)))
-                    }
-
-                    #Deviance residuals:
-                    if (family=='gaussian') {
-                        tunelist[['ssr-loc']][['deviance']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
-                        tunelist[['ssr']][['deviance']] = sum(w[permutation]*(fitted - yyy)**2)
-                    } else if (family=='poisson') {
-                        tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])
-                        tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))
-                    } else if (family=='binomial') {
-                        tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])
-                        tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))
-                    }
-
-                    if (family=='gaussian') {
-                        tunelist[['s2']] = s2
-                    } else if (family=='poisson') { 
-                        tunelist[['s2']] = summary(m)$dispersion
-                    } else if (family=='binomial') {
-                        tunelist[['s2']] = 1
-                    }
-                    tunelist[['n']] = sum(w[permutation])
-                    tunelist[['trace.local']] = Hii
-                    tunelist[['df']] = df
-                    tunelist[['df-local']] = df*w[permutation][colocated] / sum(w[permutation])
-                } else {
-                    loss.local = NA
-                }                   
+                #modeldata = data.frame(y=yy[permutation], xxx[,varset])
+                #m = glm(y~., data=modeldata, weights=w[permutation], family=family)
+                #working.weights = as.vector(m$weights)
+                #result = tryCatch({
+                #    Xh = diag(sqrt(working.weights)) %*% as.matrix(cbind(rep(1,length(permutation)), xxx[,varset]))
+                #    H = Xh %*% solve(t(Xh) %*% Xh) %*% t(Xh)
+                #    Hii = H[colocated,colocated]
+                #}, error = function(e) {
+                #    Hii = nrow(x) - 2
+                #})
+                #if (!shrunk.fit) {
+                #    fitted = m$fitted
+                #    localfit = fitted[colocated]
+                #    df = length(varset) + 1
+                #    s2 = sum((w[permutation]*m$residuals**2) / (sum(w[permutation]) - df))
+                #}
+                #coefs.unshrunk = rep(0, ncol(x) + 1)
+                #coefs.unshrunk[c(1, varset + 1)] = coef(m)
+                #s2.unshrunk = sum(w[permutation]*m$residuals**2)/sum(w[permutation])
             } else {
-            	fitted = rep(meany, length(permutation))
-                s2 = 0
-                loss = Inf
-                loss.local = c(Inf)   
-                localfit = meany
+                #modeldata = data.frame(y=yy[permutation], xxx)
+                #m = glm(y~1, data=modeldata, weights=w[permutation], family=family)
+                
+                #coefs.unshrunk = rep(0, ncol(xx) + 1)
+                #coefs.unshrunk[1] = sum(fity * w[permutation]) / sum(w[permutation])
+                #s2.unshrunk = sum((sqrt(w[permutation])*fity)**2)/sum(w[permutation])
+
+                #Hii = 1 / sum(w[permutation])
             }
+            
+            if (length(colocated)>0) {
+                tunelist[['ssr-loc']] = list()
+                tunelist[['ssr']] = list()
+                
+                #Pearson residuals:
+                if (family=='gaussian') {
+                    tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
+                    tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2)
+                } else if (family=='poisson') {
+                    tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/fitted)[colocated])
+                    tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/fitted)
+                } else if (family=='binomial') {
+                    tunelist[['ssr-loc']][['pearson']] = sum((w[permutation]*(yyy - fitted)**2/(fitted*(1-fitted)))[colocated])
+                    tunelist[['ssr']][['pearson']] = sum(w[permutation]*(fitted - yyy)**2/(fitted*(1-fitted)))
+                }
+
+                #Deviance residuals:
+                if (family=='gaussian') {
+                    tunelist[['ssr-loc']][['deviance']] = sum((w[permutation]*(fitted - yyy)**2)[colocated])
+                    tunelist[['ssr']][['deviance']] = sum(w[permutation]*(fitted - yyy)**2)
+                } else if (family=='poisson') {
+                    tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))[colocated])
+                    tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - (yyy-fitted)))
+                } else if (family=='binomial') {
+                    tunelist[['ssr-loc']][['deviance']] = sum((2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))[colocated])
+                    tunelist[['ssr']][['deviance']] = sum(2*w[permutation]*(ylogy(yyy) - yyy*log(fitted) - ylogy(1-yyy) + (1-yyy)*log(1-fitted)))
+                }
+
+                if (family=='gaussian') {
+                    tunelist[['s2']] = s2
+                } else if (family=='poisson') { 
+                    tunelist[['s2']] = summary(m)$dispersion
+                } else if (family=='binomial') {
+                    tunelist[['s2']] = 1
+                }
+                tunelist[['n']] = sum(w[permutation])
+                tunelist[['trace.local']] = Hii
+                tunelist[['df']] = df
+                tunelist[['df-local']] = df*w[permutation][colocated] / sum(w[permutation])
+            } else {
+                loss.local = NA
+            }                   
+        } else {
+            fitted = rep(meany, length(permutation))
+            s2 = 0
+            loss = Inf
+            loss.local = c(Inf)   
+            localfit = meany
         }
     
         #Get the tuning parameter to minimize the loss:
@@ -287,8 +270,9 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
     } else if (predict) {
         return(list(tunelist=tunelist, coef=coefs, weightsum=sum(w), s=s.optimal, sigma2=s2, nonzero=colnames(x)[vars[[s.optimal]]]))
     } else if (simulation) {
-        return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
+        #return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
+      return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
     } else {
-        return(list(model=model, loss=loss, coef=coefs, coef.unshrunk=coefs.unshrunk, coeflist=coef.list, nonzero=colnames(x)[vars[[s.optimal]]], s=s.optimal, loc=loc, bw=bw, meanx=meanx, meany=meany, coef.scale=adapt.weight/normx, df=df, loss.local=loss.local, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
+        return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(x)[vars[[s.optimal]]], s=s.optimal, loc=loc, bw=bw, df=df, loss.local=loss.local, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
     }
 }
