@@ -148,6 +148,7 @@ print(vars)
                         
             #Pick the lambda that minimizes the loss:
             k = which.min(loss)
+print(loss)
 print(k)
             fitted = fitted[,k]
             localfit = fitted[colocated]
