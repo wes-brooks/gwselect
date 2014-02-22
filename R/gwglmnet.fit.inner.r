@@ -133,12 +133,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         model = aglasso_R(x=xxx, y=yyy, w=w[permutation], groups=groups)
         nsteps = length(model$lambda) + 1   
     
-    
-        if (mode.select %in% c('AIC', 'AICc')) { penalty = 2 }
-        if (mode.select=='BIC') { penalty = log(sum(w[permutation])) }
-        #predx = t(apply(xx[permutation,], 1, function(X) {(X-meanx) * adapt.weight / normx}))
-        #predy = as.matrix(yy[permutation])
         vars = apply(as.matrix(model[['coefs']][-1,]), 2, function(x) {which(abs(x)>0)})
+print(vars)
         df = sapply(vars, length) + 1
 
         if (sum(w) > ncol(x)) {
@@ -148,11 +144,11 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
             s2 = sum(w[permutation]*(model[['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
             
             #Compute the loss (varies by family)
-            loss = as.vector(model[['deviance']] + penalty*df)
-            if (mode.select=='AICc') {loss = loss + 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
-            
+            loss = model[[mode.select]]
+                        
             #Pick the lambda that minimizes the loss:
             k = which.min(loss)
+print(k)
             fitted = fitted[,k]
             localfit = fitted[colocated]
             df = df[k]
@@ -163,6 +159,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
                         varset = c(varset, ncol(x)+2*(j-1)+1, ncol(x)+2*j)
                     }
                 }
+print(varset)
                 #modeldata = data.frame(y=yy[permutation], xxx[,varset])
                 #m = glm(y~., data=modeldata, weights=w[permutation], family=family)
                 #working.weights = as.vector(m$weights)
