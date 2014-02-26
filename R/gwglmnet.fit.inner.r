@@ -134,7 +134,6 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         nsteps = length(model$lambda) + 1   
     
         vars = apply(as.matrix(model[['coefs']][-1,]), 2, function(x) {which(abs(x)>0)})
-print(vars)
         df = sapply(vars, length) + 1
 
         if (sum(w) > ncol(x)) {
@@ -160,12 +159,7 @@ print(k)
             df = df[k]
             if (k > 1) {
                 varset = vars[[k]]
-                if (interact) {
-                    for (j in vars[[k]]) {
-                        varset = c(varset, ncol(x)+2*(j-1)+1, ncol(x)+2*j)
-                    }
-                }
-print(varset)
+                
                 #modeldata = data.frame(y=yy[permutation], xxx[,varset])
                 #m = glm(y~., data=modeldata, weights=w[permutation], family=family)
                 #working.weights = as.vector(m$weights)
