@@ -1,4 +1,4 @@
-gwlars.fit.knn = function(x, y, coords, indx, fit.loc, D, N=N, s, mode.select, tuning, predict, simulation, verbose, interact, prior.weights, gweight, target, beta1, beta2, tol=1e-25, longlat=FALSE, adapt, precondition=FALSE, oracle, shrunk.fit, AICc) {
+gwlars.fit.knn = function(x, y, coords, indx, fit.loc, D, N=N, s, mode.select, tuning, predict, simulation, verbose, interact, prior.weights, gweight, target, beta1, beta2, tol=1e-25, longlat=FALSE, adapt, oracle, shrunk.fit, AICc) {
     if (!is.null(fit.loc)) {
         coords.unique = fit.loc
     } else {

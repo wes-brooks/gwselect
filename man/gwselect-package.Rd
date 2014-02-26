@@ -15,7 +15,7 @@ Type: \tab Package\cr
 Version: \tab 0.1\cr
 Date: \tab 2012-08-24\cr
 License: \tab GPL-3\cr
-}
+}}
 \author{
 Wesley Brooks
 Maintainer: Wesley Brooks <wesley@somesquares.com>

@@ -1,4 +1,4 @@
-gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, mode.select, verbose, prior.weights, gweight, target, beta1, beta2, tol.loc, longlat=FALSE, precondition=FALSE, tuning, simulation, predict, N, oracle, interact, alpha, shrunk.fit, resid.type) {
+gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, mode.select, verbose, prior.weights, gweight, target, beta1, beta2, tol.loc, longlat=FALSE, tuning, simulation, predict, N, oracle, interact, alpha, shrunk.fit, resid.type) {
     coords.unique = unique(coords)
     n = dim(coords.unique)[1]
     gwglmnet.object = list()
@@ -14,11 +14,11 @@ gwglmnet.fit.nen = function(x, y, family, coords, indx, fit.loc, D, mode.select,
         opt = optimize(gwglmnet.ssr, lower=beta1, upper=beta2, maximum=FALSE, tol=tol.loc,
             x=x, y=y, coords=coords, loc=loc, alpha=alpha, resid.type=resid.type,
             gweight=gweight, verbose=verbose, dist=dist, mode.select=mode.select, family=family, oracle=oracle,
-            prior.weights=prior.weights, target=target, precondition=precondition, interact=interact, shrunk.fit=shrunk.fit)
+            prior.weights=prior.weights, target=target, interact=interact, shrunk.fit=shrunk.fit)
         bandwidth = opt$minimum
 
         if (is.null(oracle)) {
-            models[[i]] = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bandwidth, dist=dist, mode.select=mode.select, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, tuning=tuning, simulation=simulation, predict=predict, precondition=precondition, N=N, interact=interact, shrunk.fit=shrunk.fit, alpha=alpha)
+            models[[i]] = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, bw=bandwidth, dist=dist, mode.select=mode.select, verbose=verbose, gwr.weights=NULL, prior.weights=prior.weights, gweight=gweight, tuning=tuning, simulation=simulation, predict=predict, N=N, interact=interact, shrunk.fit=shrunk.fit, alpha=alpha)
         } else {
             models[[i]] = gwselect.fit.oracle(x=x, y=y, family=family, bw=bandwidth, coords=coords, loc=loc, indx=indx, oracle=oracle[[i]], N=N, mode.select=mode.select, tuning=tuning, predict=predict, simulation=simulation, verbose=verbose, dist=dist, prior.weights=prior.weights, gweight=gweight, interact=interact)
         }
