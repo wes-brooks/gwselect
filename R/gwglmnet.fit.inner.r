@@ -231,7 +231,6 @@ cat(paste("family: ", family, "\n", sep=""))
                 #tunelist[['trace.local']] = Hii
                 tunelist[['df']] = df
                 tunelist[['df-local']] = df*w[permutation][colocated] / sum(w[permutation])
-print(tunelist)
             } else {
                 loss.local = NA
             }                   
@@ -270,7 +269,7 @@ print(tunelist)
         return(list(tunelist=tunelist, coef=coefs, weightsum=sum(w), s=s.optimal, sigma2=s2, nonzero=colnames(x)[vars[[s.optimal]]]))
     } else if (simulation) {
         #return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
-      return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
+      return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=yyy[colocated], weightsum=sum(w), loss=loss))
     } else {
         return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(x)[vars[[s.optimal]]], s=s.optimal, loc=loc, bw=bw, df=df, loss.local=loss, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
     }
