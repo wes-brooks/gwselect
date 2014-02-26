@@ -1,11 +1,11 @@
-gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweight, env, oracle, mode.select, verbose, longlat, tol.loc, bw.method, N, parallel, precondition, interact, alpha, shrunk.fit, bw.select, resid.type) {    
+gwglmnet.cv.f = function(formula, data, weights, indx, family, bw, coords, gweight, env, oracle, mode.select, verbose, longlat, tol.loc, bw.method, N, parallel, interact, alpha, shrunk.fit, bw.select, resid.type) {    
     #Generate the model with the given bandwidth:
     cat(paste("starting bw:", round(bw, 3), '\n', sep=''))
     gwglmnet.model = gwglmnet(formula=formula, data=data, family=family,
         weights=weights, tuning=TRUE, indx=indx, coords=coords, gweight=gweight,
         oracle=oracle, bw=bw, N=N, mode.select=mode.select, verbose=verbose,
         longlat=longlat, bw.method=bw.method, parallel=parallel,
-        precondition=precondition, interact=interact, alpha=alpha, tol.loc=tol.loc,
+        interact=interact, alpha=alpha, tol.loc=tol.loc,
         shrunk.fit=shrunk.fit, resid.type=resid.type)
     
     if (bw.select=='AICc') {
