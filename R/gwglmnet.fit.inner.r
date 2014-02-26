@@ -190,7 +190,9 @@ print(k)
                 #Hii = 1 / sum(w[permutation])
             }
             
-            #if (length(colocated)>0) {
+            if (length(colocated)>0) {
+cat(paste("colocated obs: ", length(colocated), "\n", sep=""))
+cat(paste("family: ", family, "\n", sep=""))
                 tunelist[['ssr-loc']] = list()
                 tunelist[['ssr']] = list()
                 
@@ -229,9 +231,10 @@ print(k)
                 #tunelist[['trace.local']] = Hii
                 tunelist[['df']] = df
                 tunelist[['df-local']] = df*w[permutation][colocated] / sum(w[permutation])
-            #} else {
-            #    loss.local = NA
-            #}                   
+print(tunelist)
+            } else {
+                loss.local = NA
+            }                   
         } else {
             fitted = rep(meany, length(permutation))
             s2 = 0
