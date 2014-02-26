@@ -250,14 +250,14 @@ print(k)
             coefs = Matrix(coefs, ncol=1)
             rownames(coefs) = c("(Intercept)", colnames(x))   
 
-            coefs = coefs * c(1, adapt.weight) * c(1, 1/normx)
-            if (length(coefs)>1) {coefs[1] = mean(sqrt(w[permutation])*fity) - sum(coefs[2:length(coefs)] * drop(sqrt(w[permutation]) %*% xxx) / nrow(xxx))}
+            #coefs = coefs * c(1, adapt.weight) * c(1, 1/normx)
+            #if (length(coefs)>1) {coefs[1] = mean(sqrt(w[permutation])*fity) - sum(coefs[2:length(coefs)] * drop(sqrt(w[permutation]) %*% xxx) / nrow(xxx))}
     
-            coefs.unshrunk = Matrix(coefs.unshrunk[1:(ncol(x)+1)], ncol=1)
-            rownames(coefs.unshrunk) = c("(Intercept)", oldnames)  
+            #coefs.unshrunk = Matrix(coefs.unshrunk[1:(ncol(x)+1)], ncol=1)
+            #rownames(coefs.unshrunk) = c("(Intercept)", oldnames)  
     
-            coef.unshrunk.list[[i]] = coefs.unshrunk
-            coef.list[[i]] = coefs
+            #coef.unshrunk.list[[i]] = coefs.unshrunk
+            #coef.list[[i]] = coefs
         }
     }
     
