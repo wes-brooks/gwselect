@@ -248,7 +248,7 @@ print(k)
             #Get the coefficients:
             coefs = coefs[s.optimal,]
             coefs = Matrix(coefs, ncol=1)
-            rownames(coefs) = c("(Intercept)", colnames(x))   
+            #rownames(coefs) = c("(Intercept)", colnames(x))   
 
             #coefs = coefs * c(1, adapt.weight) * c(1, 1/normx)
             #if (length(coefs)>1) {coefs[1] = mean(sqrt(w[permutation])*fity) - sum(coefs[2:length(coefs)] * drop(sqrt(w[permutation]) %*% xxx) / nrow(xxx))}
