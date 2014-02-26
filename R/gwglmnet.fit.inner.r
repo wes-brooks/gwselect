@@ -34,8 +34,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         }
         interacted = matrix(ncol=2*ncol(x), nrow=nrow(x))
         for (k in 1:ncol(x)) {
-            interacted[,2*(k-1)+1] = x[,k]*(coords[,1]-loc[1,1])
-            interacted[,2*k] = x[,k]*(coords[,2]-loc[1,2])
+            interacted[,2*(k-1)+1] = x[,k]*(coords[,1]-loc[1])
+            interacted[,2*k] = x[,k]*(coords[,2]-loc[2])
             groups = c(groups, groups[k], groups[k])
         }
         x.interacted = cbind(x, interacted)
