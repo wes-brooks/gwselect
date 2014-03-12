@@ -16,12 +16,12 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         gwr.weights = gwr.weights[indx]
     }
 
-	#Allow for the adaptive elastic net penalty:
-	if (substring(as.character(alpha), 1, 1) == 'a') {
-		cormat = abs(cor(x))
-		diag(cormat) = NA
-		alpha = 1 - max(cormat, na.rm=TRUE)
-	}
+	  #Allow for the adaptive elastic net penalty:
+	  if (substring(as.character(alpha), 1, 1) == 'a') {
+		    cormat = abs(cor(x))
+		    diag(cormat) = NA
+        alpha = 1 - max(cormat, na.rm=TRUE)
+    }
 
     #For interaction on location:
     groups = 0:(ncol(x)-1)
@@ -91,46 +91,8 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         xxx = xx[permutation,]
         if (interact) {xxx = xx.interacted[permutation,]}
         yyy = yy[permutation]
-        #meany = sum((w*yy)[permutation])/sum(w)
-        #
-        #one <- rep(1, nrow(xxx))
-        #meanx <- drop(one %*% xxx) / nrow(xxx)
-        #x.centered <- scale(xxx, meanx, FALSE)         # first subtracts mean
-        #normx <- sqrt(drop(one %*% (x.centered**2)))
-        #names(normx) <- NULL
-        #xs = x.centered
-        #
-        #for (k in 1:dim(x.centered)[2]) {
-        #    if (normx[k]!=0) {
-        #        xs[,k] = xs[,k] / normx[k]
-        #    } else {
-        #        xs[,k] = rep(0, dim(xs)[1])
-        #        normx[k] = Inf #This should allow the lambda-finding step to work.
-        #    }
-        #}
-        #
-        #glm.step = try(glm(yyy~xs, weights=w[permutation], family=family))
-        #
-        #if("try-error" %in% class(glm.step)) { 
-        #    cat(paste("Couldn't make a model for finding the SSR at location ", i, ", bandwidth ", bw, "\n", sep=""))
-        #    return(return(list(loss.local=Inf, resid=Inf)))
-        #}
-        #
-        #beta.glm = glm.step$coeff[-1]                   # mle except for intercept
-        #adapt.weight = abs(beta.glm)               # weights for adaptive lasso
-        #for (k in 1:dim(x.centered)[2]) {
-        #    if (!is.na(adapt.weight[k])) {
-        #        xs[,k] = xs[,k] * adapt.weight[k]
-        #    } else {
-        #        xs[,k] = rep(0, dim(xs)[1])
-        #        adapt.weight[k] = 0 #This should allow the lambda-finding step to work.
-        #    }
-        #}
-        #
-        #fitx = xs
-        #fity = yyy
         
-        model = aglasso_R(x=xxx, y=yyy, w=w[permutation], groups=groups)
+        model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], groups=groups, nlam=100, min.frac=0.0001, adaptive=TRUE)
         nsteps = length(model$lambda) + 1   
     
         vars = apply(as.matrix(model[['coefs']][-1,]), 2, function(x) {which(abs(x)>0)})
@@ -147,7 +109,9 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
             if (mode.select == 'AIC') {penalty = 2*df}
             if (mode.select == 'AICc') {penalty = 2*df*(df-1)/(sum(w) - df - 1)}
             if (mode.select == 'BIC') {penalty = sum(w[permutation])*df}
-print(model[['residuals']][colocated,])
+print(apply(model[['residuals']], 1, function(x) sum(w[permutation] * x**2)))
+#print(model[['residuals']]**2)
+#print(w[permutation])
             loss = (model[['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
             
             #Pick the lambda that minimizes the loss:
