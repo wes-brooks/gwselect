@@ -91,12 +91,10 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         yyy = yy[permutation]
         
         model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
-print(model[['beta']])
+
         nsteps = length(model$lambda) + 1       
         vars = apply(as.matrix(model[['beta']]), 2, function(x) {which(x!=0)})
-print(vars)
         df = sapply(vars, length)
-print(df)
 
         if (sum(w) > ncol(x)) {
             #Extract the fitted values for each lambda:
@@ -110,17 +108,12 @@ print(df)
             if (mode.select == 'AIC') {penalty = 2*df}
             if (mode.select == 'AICc') {penalty = 2*df + 2*df*(df+1)/(sum(w[permutation]) - df - 1)}
             if (mode.select == 'BIC') {penalty = sum(w[permutation])*df}
-print(apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation] * x**2)))
-#print(model[['residuals']]**2)
-#print(w[permutation])
-print(penalty)
-            #loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
-loss = apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation]*x**2)) + penalty
+
+loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
+#loss = apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation]*x**2)) + penalty
 
             #Pick the lambda that minimizes the loss:
             k = which.min(loss)
-print(loss)
-print(k)
             fitted = fitted[,k]
             localfit = fitted[colocated]
             df = df[k]
