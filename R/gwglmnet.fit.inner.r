@@ -91,6 +91,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         yyy = yy[permutation]
         
         model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
+print(model[['beta']])
         nsteps = length(model$lambda) + 1       
         vars = apply(as.matrix(model[['beta']][-1,]), 2, function(x) {which(x!=0)})
         df = sapply(vars, length) + 1
