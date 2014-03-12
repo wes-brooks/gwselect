@@ -84,7 +84,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
     sumw = sum(w[permutation])
     
     #Use the adaptive group lasso to produce a local model:
-    model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=vargroup, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
+    model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=vargroup, standardize=FALSE, alpha=0, nlam=80, min.frac=0.001, adaptive=TRUE)
 
     
     vars = apply(as.matrix(model[['beta']]), 2, function(x) {which(x!=0)})
