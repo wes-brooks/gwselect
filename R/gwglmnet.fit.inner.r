@@ -151,8 +151,6 @@ loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutatio
             }
             
             if (length(colocated)>0) {
-cat(paste("colocated obs: ", length(colocated), "\n", sep=""))
-cat(paste("family: ", family, "\n", sep=""))
                 tunelist[['ssr-loc']] = list()
                 tunelist[['ssr']] = list()
                 
