@@ -1,24 +1,8 @@
-gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, event=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, gweight=NULL, longlat=FALSE, interact, N=1, alpha, shrunk.fit) {
+gwglmnet.fit.inner = function(x, y, coords, loc, event=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, longlat=FALSE, interact, N=1) {
+
   #Find which observations were made at the model location  
-  if (!is.null(indx)) {colocated = which(round(coords[indx,1],5)==round(as.numeric(loc[1]),5) & round(coords[indx,2],5) == round(as.numeric(loc[2]),5))}
-  else {colocated = which(round(coords[,1],5) == round(as.numeric(loc[1]),5) & round(coords[,2],5) == round(as.numeric(loc[2]),5))}
-
-  if (is.null(gwr.weights)) {
-    gwr.weights = gweight(dist, bw)     
-  } 
-  gwr.weights = drop(gwr.weights)  
-
-  if (!is.null(indx)) {
-    gwr.weights = gwr.weights[indx]
-  }
-
-  #Allow for the adaptive elastic net penalty:
-  if (substring(as.character(alpha), 1, 1) == 'a') {
-    cormat = abs(cor(x))
-    diag(cormat) = NA
-    alpha = 1 - max(cormat, na.rm=TRUE)
-  }
-
+  colocated = which(round(coords[,1],5) == round(as.numeric(loc[1]),5) & round(coords[,2],5) == round(as.numeric(loc[2]),5))
+  
   #Establish groups for the group lasso
   vargroup = 1:ncol(x)
   
@@ -174,18 +158,20 @@ loss = sumw * (log(apply(model[['results']][['residuals']], 2, function(x) sum(w
     coefs = t(rbind(model[['intercept']], model[['beta']]))[k,]
     coefs = Matrix(coefs, ncol=1)
     #rownames(coefs) = c("(Intercept)", colnames(xxx))
+print(c("(Intercept)", colnames(xxx)))
+print(rownames(coefs))
 
     coef.list[[i]] = coefs
   }
   
   if (tuning) {
-    return(list(tunelist=tunelist, s=k, sigma2=s2, nonzero=colnames(xxx)[vars[[k]]], weightsum=sum(w), loss=loss, alpha=alpha))
+    return(list(tunelist=tunelist, s=k, sigma2=s2, nonzero=colnames(xxx)[vars[[k]]], weightsum=sumw, loss=loss))
   } else if (predict) {
-    return(list(tunelist=tunelist, coef=coefs, weightsum=sum(w), s=k, sigma2=s2, nonzero=colnames(xxx)[vars[[k]]]))
+    return(list(tunelist=tunelist, coef=coefs, weightsum=sumw, s=k, sigma2=s2, nonzero=colnames(xxx)[vars[[k]]]))
   } else if (simulation) {
-    #return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=k, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[k]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
-    return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=k, bw=bw, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(xxx)[vars[[k]]], actual=yyy[colocated], weightsum=sum(w), loss=loss))
+    #return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=k, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, nonzero=colnames(x)[vars[[k]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
+    return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=k, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(xxx)[vars[[k]]], actual=yyy[colocated], weightsum=sumw, loss=loss))
   } else {
-    return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(xxx)[vars[[k]]], s=k, loc=loc, bw=bw, df=df, loss.local=loss, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
+    return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(xxx)[vars[[k]]], s=k, loc=loc, df=df, loss.local=loss, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, weightsum=sumw))
   }
 }
