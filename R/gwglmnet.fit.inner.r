@@ -93,9 +93,9 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
 print(model[['beta']])
         nsteps = length(model$lambda) + 1       
-        vars = apply(as.matrix(model[['beta']][-1,]), 2, function(x) {which(x!=0)})
+        vars = apply(as.matrix(model[['beta']]), 2, function(x) {which(x!=0)})
 print(vars)
-        df = sapply(vars, length) + 1
+        df = sapply(vars, length)
 print(df)
 
         if (sum(w) > ncol(x)) {
@@ -231,13 +231,13 @@ cat(paste("family: ", family, "\n", sep=""))
     }
     
     if (tuning) {
-        return(list(tunelist=tunelist, s=s.optimal, sigma2=s2, nonzero=colnames(x)[vars[[s.optimal]]], weightsum=sum(w), loss=loss, alpha=alpha))
+        return(list(tunelist=tunelist, s=s.optimal, sigma2=s2, nonzero=colnames(xxx)[vars[[s.optimal]]], weightsum=sum(w), loss=loss, alpha=alpha))
     } else if (predict) {
-        return(list(tunelist=tunelist, coef=coefs, weightsum=sum(w), s=s.optimal, sigma2=s2, nonzero=colnames(x)[vars[[s.optimal]]]))
+        return(list(tunelist=tunelist, coef=coefs, weightsum=sum(w), s=s.optimal, sigma2=s2, nonzero=colnames(xxx)[vars[[s.optimal]]]))
     } else if (simulation) {
         #return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
-      return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(x)[vars[[s.optimal]]], actual=yyy[colocated], weightsum=sum(w), loss=loss))
+      return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=s.optimal, bw=bw, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(xxx)[vars[[s.optimal]]], actual=yyy[colocated], weightsum=sum(w), loss=loss))
     } else {
-        return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(x)[vars[[s.optimal]]], s=s.optimal, loc=loc, bw=bw, df=df, loss.local=loss, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
+        return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(xxx)[vars[[s.optimal]]], s=s.optimal, loc=loc, bw=bw, df=df, loss.local=loss, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, alpha=alpha, weightsum=sum(w)))
     }
 }
