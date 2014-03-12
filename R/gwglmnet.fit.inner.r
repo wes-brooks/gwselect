@@ -95,7 +95,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
         nsteps = length(model$lambda) + 1   
     
-        vars = apply(as.matrix(model[['coefs']][-1,]), 2, function(x) {which(abs(x)>0)})
+        vars = apply(as.matrix(model[['beta']][-1,]), 2, function(x) {which(x!=0)})
         df = sapply(vars, length) + 1
 
         if (sum(w) > ncol(x)) {
