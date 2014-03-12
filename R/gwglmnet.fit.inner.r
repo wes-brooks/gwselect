@@ -101,15 +101,16 @@ print(model[['beta']])
         if (sum(w) > ncol(x)) {
             #Extract the fitted values for each lambda:
             coefs = t(as.matrix(model[['beta']]))
-            fitted = model[['fitted']] #predict(model, newx=predx, type="response")   
-            s2 = sum(w[permutation]*(model[['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
+            fitted = model[['results']][['fitted']] #predict(model, newx=predx, type="response")  
+print(fitted)
+            s2 = sum(w[permutation]*(model[['results']][['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
             
             #Compute the loss (varies by family)
             #loss = model[[mode.select]]
             if (mode.select == 'AIC') {penalty = 2*df}
             if (mode.select == 'AICc') {penalty = 2*df*(df-1)/(sum(w) - df - 1)}
             if (mode.select == 'BIC') {penalty = sum(w[permutation])*df}
-print(apply(model[['residuals']], 1, function(x) sum(w[permutation] * x**2)))
+print(apply(model[['results']][['residuals']], 1, function(x) sum(w[permutation] * x**2)))
 #print(model[['residuals']]**2)
 #print(w[permutation])
             loss = (model[['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
