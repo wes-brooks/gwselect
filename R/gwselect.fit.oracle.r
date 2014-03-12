@@ -1,4 +1,4 @@
-gwselect.fit.oracle = function(x, y, coords, loc, family='gaussian', oracle, tuning, predict, simulation, verbose, interact, mode.select, gwr.weights, prior.weights, longlat, N) {
+gwselect.fit.oracle = function(x, y, coords, loc, family='gaussian', oracle, tuning, predict, simulation, verbose, interact, gwr.weights, prior.weights, longlat, N) {
 
   colocated = which(round(coords[,1],5) == round(as.numeric(loc[1]),5) & round(coords[,2],5) == round(as.numeric(loc[2]),5))        
 
@@ -79,9 +79,6 @@ gwselect.fit.oracle = function(x, y, coords, loc, family='gaussian', oracle, tun
     	if (sum(w) > dim(permuted)[2]) {  		
   			s2 = sum(w[permutation] * model$residuals**2)/(sum(w) - df)
         
-        if (mode.select=='AIC') {penalty=2}
-        else if (mode.select=='BIC') {penalty=log(sum(w[permutation]))}
-
 				fitted = predict(model, newdata=permuted, type='response')
 		    Xh = diag(sqrt(w[permutation])) %*% as.matrix(cbind(rep(1,length(permutation)), xx))
         H = Xh %*% solve(t(Xh) %*% Xh) %*% t(Xh)

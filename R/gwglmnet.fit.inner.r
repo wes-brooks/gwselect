@@ -1,4 +1,4 @@
-gwglmnet.fit.inner = function(x, y, coords, loc, event=NULL, family, mode.select, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, longlat=FALSE, interact, N=1) {
+gwglmnet.fit.inner = function(x, y, coords, loc, event=NULL, family, varselect.method, tuning, predict, simulation, verbose, gwr.weights=NULL, prior.weights=NULL, longlat=FALSE, interact, N=1) {
 
   #Find which observations were made at the model location  
   colocated = which(round(coords[,1],5) == round(as.numeric(loc[1]),5) & round(coords[,2],5) == round(as.numeric(loc[2]),5))
@@ -80,10 +80,10 @@ gwglmnet.fit.inner = function(x, y, coords, loc, event=NULL, family, mode.select
       s2 = sum(w[permutation]*(model[['results']][['residuals']][,ncol(fitted)])**2) / (sumw - df) 
       
       #Compute the loss (varies by family)
-      #loss = model[[mode.select]]
-      if (mode.select == 'AIC') {penalty = 2*df}
-      if (mode.select == 'AICc') {penalty = 2*df + 2*df*(df+1)/(sumw - df - 1)}
-      if (mode.select == 'BIC') {penalty = sumw*df}
+      #loss = model[[varselect.method]]
+      if (varselect.method == 'AIC') {penalty = 2*df}
+      if (varselect.method == 'AICc') {penalty = 2*df + 2*df*(df+1)/(sumw - df - 1)}
+      if (varselect.method == 'BIC') {penalty = sumw*df}
 
 
 #Assuming scale from the largest model:

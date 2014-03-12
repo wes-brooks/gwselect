@@ -1,11 +1,11 @@
-gwglmnet.ssr = function(bw, x, y, family, coords, loc, dist, verbose, prior.weights, gweight, target, mode.select, interact, oracle, resid.type) {
+gwglmnet.ssr = function(bw, x, y, family, coords, loc, dist, verbose, prior.weights, gweight, target, varselect.method, interact, oracle, resid.type) {
   #Calculate the local weights:
   kernweights = drop(gweight(dist, bw))
   
   if (is.null(oracle)) {
-    gwglmnet.object = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, mode.select=mode.select, interact=interact, predict=TRUE, tuning=FALSE, simulation=FALSE, verbose=verbose, gwr.weights=kernweights, prior.weights=prior.weights)
+    gwglmnet.object = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, varselect.method=varselect.method, interact=interact, predict=TRUE, tuning=FALSE, simulation=FALSE, verbose=verbose, gwr.weights=kernweights, prior.weights=prior.weights)
   } else {
-    gwglmnet.object = gwselect.fit.oracle(x=x, y=y, family=family, coords=coords, loc=loc, mode.select=mode.select, interact=interact, predict=TRUE, tuning=FALSE, simulation=FALSE, verbose=verbose, gwr.weights=kernweights, prior.weights=prior.weights, oracle=oracle[[i]])
+    gwglmnet.object = gwselect.fit.oracle(x=x, y=y, family=family, coords=coords, loc=loc, interact=interact, predict=TRUE, tuning=FALSE, simulation=FALSE, verbose=verbose, gwr.weights=kernweights, prior.weights=prior.weights, oracle=oracle[[i]])
   }
   
   loss = gwglmnet.object[['ssr']][[resid.type]]

@@ -1,4 +1,4 @@
-gwglmnet.fit.fixedbw = function(x, y, family, coords, fit.loc=NULL, oracle, bw, D=NULL, verbose=FALSE, mode.select, gwr.weights=NULL, indx=NULL, prior.weights=NULL, tuning=FALSE, predict=FALSE, gweight=NULL, longlat=FALSE, alpha, simulation, interact, N, shrunk.fit, resid.type) {
+gwglmnet.fit.fixedbw = function(x, y, family, coords, fit.loc=NULL, oracle, bw, D=NULL, verbose=FALSE, varselect.method, gwr.weights=NULL, indx=NULL, prior.weights=NULL, tuning=FALSE, predict=FALSE, gweight=NULL, longlat=FALSE, alpha, simulation, interact, N, shrunk.fit, resid.type) {
   if (!is.null(fit.loc)) { coords.unique = fit.loc }
   else { coords.unique = unique(coords) }
   n = dim(coords.unique)[1]
@@ -21,9 +21,9 @@ gwglmnet.fit.fixedbw = function(x, y, family, coords, fit.loc=NULL, oracle, bw, 
     gw = gweights[[i]]
 
   	if (is.null(oracle)) {
-      models[[i]] = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, verbose=verbose, N=N, mode.select=mode.select, gwr.weights=gw, prior.weights=prior.weights, predict=predict, tuning=tuning, simulation=simulation, interact=interact)
+      models[[i]] = gwglmnet.fit.inner(x=x, y=y, family=family, coords=coords, loc=loc, verbose=verbose, N=N, varselect.method=varselect.method, gwr.weights=gw, prior.weights=prior.weights, predict=predict, tuning=tuning, simulation=simulation, interact=interact)
   	} else {
-      models[[i]] = gwselect.fit.oracle(x=x, y=y, family=family, coords=coords, loc=loc, verbose=verbose, N=N, mode.select=mode.select, gwr.weights=gw, prior.weights=prior.weights, predict=predict, tuning=tuning, simulation=simulation, interact=interact, oracle=oracle[[i]])
+      models[[i]] = gwselect.fit.oracle(x=x, y=y, family=family, coords=coords, loc=loc, verbose=verbose, N=N, gwr.weights=gw, prior.weights=prior.weights, predict=predict, tuning=tuning, simulation=simulation, interact=interact, oracle=oracle[[i]])
     }
 
     if (verbose) {

@@ -1,4 +1,4 @@
-gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, tuning=FALSE, predict=FALSE, simulation=FALSE, oracle=NULL, gweight, bw=NULL, mode.select=c('AIC','BIC','AICc'), verbose=FALSE, longlat, tol.loc=NULL, N=1, bw.method=c('dist','knn','nen'), parallel=FALSE, D=NULL, interact=FALSE, resid.type=c('deviance','pearson')) {
+gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, tuning=FALSE, predict=FALSE, simulation=FALSE, oracle=NULL, gweight, bw=NULL, varselect.method=c('AIC','BIC','AICc'), verbose=FALSE, longlat, tol.loc=NULL, N=1, bw.type=c('dist','knn','nen'), parallel=FALSE, D=NULL, interact=FALSE, resid.type=c('deviance','pearson')) {
     if (is(data, "Spatial")) {
         if (!missing(coords)) 
             warning("data is Spatial* object, ignoring coords argument")
@@ -49,15 +49,15 @@ gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, 
 
     res = list()
     resid.type = match.arg(resid.type)
-    bw.method = match.arg(bw.method)
-    mode.select = match.arg(mode.select)
+    bw.type = match.arg(bw.type)
+    varselect.method = match.arg(varselect.method)
 
-    if (bw.method=='dist') {
+    if (bw.type=='dist') {
         weight.matrix = gweight(D, bw)
         if (parallel) {
-            res[['model']] = gwglmnet.fit.fixedbwparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, N=N, coords=coords, oracle=oracle, mode.select=mode.select, bw=bw, fit.loc=fit.loc, gwr.weights=weight.matrix, verbose=verbose, interact=interact, resid.type=resid.type)
+            res[['model']] = gwglmnet.fit.fixedbwparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, N=N, coords=coords, oracle=oracle, varselect.method=varselect.method, bw=bw, fit.loc=fit.loc, gwr.weights=weight.matrix, verbose=verbose, interact=interact, resid.type=resid.type)
         } else {
-            res[['model']] = gwglmnet.fit.fixedbw(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, N=N, coords=coords, oracle=oracle, mode.select=mode.select, bw=bw, fit.loc=fit.loc, gwr.weights=weight.matrix, verbose=verbose, interact=interact, resid.type=resid.type)
+            res[['model']] = gwglmnet.fit.fixedbw(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, N=N, coords=coords, oracle=oracle, varselect.method=varselect.method, bw=bw, fit.loc=fit.loc, gwr.weights=weight.matrix, verbose=verbose, interact=interact, resid.type=resid.type)
         }
     } else {        
         bbox <- cbind(range(coords[, 1]), range(coords[, 2]))
@@ -67,17 +67,17 @@ gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, 
         beta1 = difmin/300
         beta2 = 10*difmin
 
-        if (bw.method=='nen') {
+        if (bw.type=='nen') {
             if (parallel) {
-                res[['model']] = gwglmnet.fit.nenparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, mode.select=mode.select, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
+                res[['model']] = gwglmnet.fit.nenparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, varselect.method=varselect.method, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
             } else {
-                res[['model']] = gwglmnet.fit.nen(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, mode.select=mode.select, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
+                res[['model']] = gwglmnet.fit.nen(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, varselect.method=varselect.method, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
             }
-        } else if (bw.method=='knn') {
+        } else if (bw.type=='knn') {
             if (parallel) {
-                res[['model']] = gwglmnet.fit.knnparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, mode.select=mode.select, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
+                res[['model']] = gwglmnet.fit.knnparallel(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, varselect.method=varselect.method, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
             } else {
-                res[['model']] = gwglmnet.fit.knn(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, mode.select=mode.select, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
+                res[['model']] = gwglmnet.fit.knn(x=x, y=y, family=family, prior.weights=weights, tuning=tuning, predict=predict, simulation=simulation, coords=coords, oracle=oracle, fit.loc=fit.loc, N=N, D=D, longlat=longlat, varselect.method=varselect.method, verbose=verbose, target=bw, gweight=gweight, beta1=beta1, beta2=beta2, tol.loc=tol.loc, interact=interact, resid.type=resid.type)
             }
         }
     }
@@ -92,8 +92,8 @@ gwglmnet <- function(formula, data, family, weights=NULL, coords, fit.loc=NULL, 
         res[['longlat']] = longlat
         res[['gweight']] = gweight
         res[['bw']] = bw
-        res[['bw.method']] = bw.method
-        res[['mode.select']] = mode.select
+        res[['bw.type']] = bw.type
+        res[['varselect.method']] = varselect.method
         res[['interact']] = interact
     }
     class(res) = "gwselect"
