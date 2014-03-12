@@ -92,7 +92,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         if (interact) {xxx = xx.interacted[permutation,]}
         yyy = yy[permutation]
         
-        model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, nlam=100, min.frac=0.0001, adaptive=TRUE)
+        model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
         nsteps = length(model$lambda) + 1   
     
         vars = apply(as.matrix(model[['coefs']][-1,]), 2, function(x) {which(abs(x)>0)})
