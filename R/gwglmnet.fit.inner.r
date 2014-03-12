@@ -106,7 +106,7 @@ print(df)
             #Compute the loss (varies by family)
             #loss = model[[mode.select]]
             if (mode.select == 'AIC') {penalty = 2*df}
-            if (mode.select == 'AICc') {penalty = 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
+            if (mode.select == 'AICc') {penalty = 2*df + 2*df*(df+1)/(sum(w[permutation]) - df - 1)}
             if (mode.select == 'BIC') {penalty = sum(w[permutation])*df}
 print(apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation] * x**2)))
 #print(model[['residuals']]**2)
