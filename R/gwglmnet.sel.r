@@ -26,7 +26,7 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
 
   bw.type = match.arg(bw.type)
   varselect.method = match.arg(varselect.method)
-  bwselect.type = match.arg(bwselect.type)
+  bwselect.method = match.arg(bwselect.method)
   resid.type = match.arg(resid.type)
     
   if (!is.null(range)) {
