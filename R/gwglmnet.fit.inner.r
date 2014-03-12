@@ -171,7 +171,7 @@ loss = sumw * (log(apply(model[['results']][['residuals']], 2, function(x) sum(w
     }
     
     #Get the coefficients:
-    coefs = t(rbind(model[['intercept']], model[['beta']])[k,]
+    coefs = t(rbind(model[['intercept']], model[['beta']]))[k,]
     coefs = Matrix(coefs, ncol=1)
     rownames(coefs) = c("(Intercept)", colnames(xxx))
 
