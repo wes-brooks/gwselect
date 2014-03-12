@@ -24,9 +24,9 @@ gwglmnet.sel = function(formula, data=list(), family, range=NULL, weights=NULL, 
     stop("negative weights")
   y <- model.extract(mf, "response")
 
-  bw.method = match.arg(bw.method)
-  mode.select = match.arg(mode.select)
-  bw.select = match.arg(bw.select)
+  bw.type = match.arg(bw.type)
+  varselect.method = match.arg(varselect.method)
+  bwselect.type = match.arg(bwselect.type)
   resid.type = match.arg(resid.type)
     
   if (!is.null(range)) {
