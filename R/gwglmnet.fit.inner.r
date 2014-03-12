@@ -94,13 +94,13 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         
         model = SGL(data=list(x=xxx, y=yyy), weights=w[permutation], index=groups, standardize=FALSE, alpha=0, nlam=100, min.frac=0.0001, adaptive=TRUE)
         nsteps = length(model$lambda) + 1   
-    
+print(model[['beta']])    
         vars = apply(as.matrix(model[['beta']][-1,]), 2, function(x) {which(x!=0)})
         df = sapply(vars, length) + 1
 
         if (sum(w) > ncol(x)) {
             #Extract the fitted values for each lambda:
-            coefs = t(as.matrix(model[['coefs']]))
+            coefs = t(as.matrix(model[['beta']]))
             fitted = model[['fitted']] #predict(model, newx=predx, type="response")   
             s2 = sum(w[permutation]*(model[['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
             
