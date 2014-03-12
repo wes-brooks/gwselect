@@ -114,7 +114,7 @@ print(model[['beta']])
 #print(model[['residuals']]**2)
 #print(w[permutation])
             #loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
-loss = (model[['results']][['residuals']])**2 + penalty
+loss = apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation]*x**2)) + penalty
 
             #Pick the lambda that minimizes the loss:
             k = which.min(loss)
