@@ -17,11 +17,11 @@ gwglmnet.fit.inner = function(x, y, coords, loc, event=NULL, family, varselect.m
     interacted = matrix(ncol=2*ncol(x), nrow=nrow(x))
     for (k in 1:ncol(x)) {
       interacted[,2*(k-1)+1] = x[,k]*(coords[,1]-loc[1])
-print(interacted)
-print(coords)
+
 print(loc)
-print(x)
+print(head(x))
 print(k)
+print(interacted)
       interacted[,2*k] = x[,k]*(coords[,2]-loc[2])
       vargroup = c(vargroup, vargroup[k], vargroup[k])
     }
