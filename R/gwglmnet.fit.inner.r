@@ -86,8 +86,6 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
         }
 
         colocated = which(gwr.weights[weighted][permutation]==1)
-        sqrt.w <- diag(sqrt(w[permutation]))
-
         xxx = xx[permutation,]
         if (interact) {xxx = xx.interacted[permutation,]}
         yyy = yy[permutation]
@@ -108,11 +106,12 @@ print(df)
             #Compute the loss (varies by family)
             #loss = model[[mode.select]]
             if (mode.select == 'AIC') {penalty = 2*df}
-            if (mode.select == 'AICc') {penalty = 2*df*(df-1)/(sum(w) - df - 1)}
+            if (mode.select == 'AICc') {penalty = 2*df*(df-1)/(sum(w[permutation]) - df - 1)}
             if (mode.select == 'BIC') {penalty = sum(w[permutation])*df}
 print(apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation] * x**2)))
 #print(model[['residuals']]**2)
 #print(w[permutation])
+print(penalty)
             #loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
 loss = apply(model[['results']][['residuals']], 2, function(x) sum(w[permutation]*x**2)) + penalty
 
