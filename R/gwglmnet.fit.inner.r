@@ -94,6 +94,7 @@ gwglmnet.fit.inner = function(x, y, coords, indx=NULL, loc, bw=NULL, dist=NULL, 
 print(model[['beta']])
         nsteps = length(model$lambda) + 1       
         vars = apply(as.matrix(model[['beta']][-1,]), 2, function(x) {which(x!=0)})
+print(vars)
         df = sapply(vars, length) + 1
 print(df)
 
