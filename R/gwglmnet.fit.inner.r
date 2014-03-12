@@ -102,7 +102,7 @@ print(model[['beta']])
             #Extract the fitted values for each lambda:
             coefs = t(as.matrix(model[['beta']]))
             fitted = model[['results']][['fitted']] #predict(model, newx=predx, type="response")  
-print(fitted)
+
             s2 = sum(w[permutation]*(model[['results']][['residuals']][,ncol(fitted)])**2) / (sum(w[permutation]) - df) 
             
             #Compute the loss (varies by family)
@@ -110,11 +110,12 @@ print(fitted)
             if (mode.select == 'AIC') {penalty = 2*df}
             if (mode.select == 'AICc') {penalty = 2*df*(df-1)/(sum(w) - df - 1)}
             if (mode.select == 'BIC') {penalty = sum(w[permutation])*df}
-print(apply(model[['results']][['residuals']], 1, function(x) sum(w[permutation] * x**2)))
+#print(apply(model[['results']][['residuals']], 1, function(x) sum(w[permutation] * x**2)))
 #print(model[['residuals']]**2)
 #print(w[permutation])
-            loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
-            
+            #loss = (model[['results']][['residuals']][colocated,])**2 + penalty*w[permutation][colocated] / sum(w[permutation])
+loss = (model[['results']][['residuals']])**2 + penalty
+
             #Pick the lambda that minimizes the loss:
             k = which.min(loss)
 print(loss)
