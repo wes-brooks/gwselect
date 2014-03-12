@@ -155,13 +155,9 @@ loss = sumw * (log(apply(model[['results']][['residuals']], 2, function(x) sum(w
     }
     
     #Get the coefficients:
-print(model[['beta']])
-print(model[['intercept']])
-print(rbind(model[['intercept']], model[['beta']]))
     coefs = t(rbind(model[['intercept']], model[['beta']]))[k,]
     coefs = Matrix(coefs, ncol=1)
-    #rownames(coefs) = c("(Intercept)", colnames(xxx))
-
+    rownames(coefs) = c("(Intercept)", colnames(xxx))
 
     coef.list[[i]] = coefs
   }
@@ -174,6 +170,6 @@ print(rbind(model[['intercept']], model[['beta']]))
     #return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=k, sigma2=s2, coef.unshrunk=coefs.unshrunk, s2.unshrunk=s2.unshrunk, coef.unshrunk.list=coef.unshrunk.list, fitted=localfit, nonzero=colnames(x)[vars[[k]]], actual=predy[colocated], weightsum=sum(w), loss=loss))
     return(list(tunelist=tunelist, coef=coefs, coeflist=coef.list, s=k, sigma2=s2, fitted=localfit, alpha=alpha, nonzero=colnames(xxx)[vars[[k]]], actual=yyy[colocated], weightsum=sumw, loss=loss))
   } else {
-    return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(xxx)[vars[[k]]], s=k, loc=loc, df=df, loss.local=loss, sigma2=s2, sum.weights=sum(w), N=N, fitted=localfit, weightsum=sumw))
+    return(list(model=model, loss=loss, coef=coefs, coeflist=coef.list, nonzero=colnames(xxx)[vars[[k]]], s=k, loc=loc, df=df, loss.local=loss, sigma2=s2, N=N, fitted=localfit, weightsum=sumw))
   }
 }
