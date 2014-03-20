@@ -10,7 +10,7 @@ gwglmnet.cv.f = function(formula, data, weights, family, bw, coords, gweight, en
   #Compute the loss at this bandwidth
   if (bwselect.method=='AICc') {
     #trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)}))
-   	trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['df-local']],1)}))
+   	trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) tail(x[['tunelist']][['df-local']],1)))
    	loss = nrow(data) * (log(mean(sapply(gwglmnet.model[['model']][['models']], function(x) {x[['tunelist']][['ssr-loc']][[resid.type]]}))) + 1 + (2*(trH+1))/(nrow(data)-trH-2) + log(2*pi))
   } else if (bwselect.method=='GCV') {
     trH = sum(sapply(gwglmnet.model[['model']][['models']], function(x) {tail(x[['tunelist']][['trace.local']],1)})) 
