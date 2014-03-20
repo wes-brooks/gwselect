@@ -74,7 +74,7 @@ gwglmnet.fit.inner = function(x, y, coords, loc, event=NULL, family, varselect.m
 
     
     vars = apply(as.matrix(model[['beta']]), 2, function(x) {which(x!=0)})
-    df = sapply(vars, length)
+    df = model[['results']][['df']]
 
     if (sumw > ncol(x)) {
       #Extract the fitted values for each lambda:
